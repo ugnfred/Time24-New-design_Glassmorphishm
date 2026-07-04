@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+
+  [data-app-root]{
+    color-scheme: dark;
+    --bg:#07060d;
+    --fg-rgb:236,233,244;
+    --accent:#b39bff;
+    --accent-rgb:179,155,255;
+    --grad:linear-gradient(120deg,#22d3ee 0%,#a855f7 50%,#f472b6 100%);
+    --panel:rgba(255,255,255,0.05);
+    --field:rgba(255,255,255,0.06);
+    --on-accent:#0b0918;
+    --shadow:0 24px 60px -28px rgba(0,0,0,0.85);
+    --blob-a:rgba(34,211,238,0.42);
+    --blob-b:rgba(168,85,247,0.46);
+    --blob-c:rgba(244,114,182,0.40);
+    --blob-d:rgba(99,102,241,0.42);
+  }
+  [data-app-root][data-theme="light"]{
+    color-scheme: light;
+    --bg:#edeefb;
+    --fg-rgb:31,27,52;
+    --accent:#7c3aed;
+    --accent-rgb:124,58,237;
+    --grad:linear-gradient(120deg,#0ea5e9 0%,#7c3aed 50%,#db2777 100%);
+    --panel:rgba(255,255,255,0.58);
+    --field:rgba(255,255,255,0.78);
+    --on-accent:#ffffff;
+    --shadow:0 24px 55px -26px rgba(80,55,160,0.45);
+    --blob-a:rgba(56,189,248,0.26);
+    --blob-b:rgba(168,85,247,0.24);
+    --blob-c:rgba(236,72,153,0.22);
+    --blob-d:rgba(99,102,241,0.24);
+  }
+
+  ::selection { background: rgba(var(--accent-rgb),0.35); }
+  [data-tz-select]:focus, input:focus, textarea:focus { outline: none; border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(var(--accent-rgb),0.28); }
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb { background: rgba(var(--fg-rgb),0.2); border-radius: 9px; }
+  ::placeholder { color: rgba(var(--fg-rgb),0.34); }
+  [data-tz-select] option { background: #ffffff; color: #111111; }
+  [data-tz-select] optgroup { background: #ffffff; color: #111111; }
+
+  section, nav, footer { position: relative; z-index: 1; }
+  section { animation: rise .6s cubic-bezier(.2,.75,.25,1); }
+
+  button { transition: filter .2s ease, box-shadow .25s ease, transform .2s ease; }
+  button:hover { filter: brightness(1.08) saturate(1.04); }
+
+  .t24-blob { position:absolute; border-radius:50%; filter:blur(72px); will-change:transform; }
+
+  @keyframes rise { from { transform: translateY(20px); } to { transform: none; } }
+  @keyframes floatA { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(70px,46px) scale(1.2);} }
+  @keyframes floatB { 0%{transform:translate(0,0) scale(1.12);} 100%{transform:translate(-80px,34px) scale(0.92);} }
+  @keyframes floatC { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(46px,-58px) scale(1.22);} }
+  @keyframes floatD { 0%{transform:translate(0,0) scale(0.96);} 100%{transform:translate(-56px,-34px) scale(1.16);} }
+  @keyframes glowPulse { 0%,100%{opacity:0.85;} 50%{opacity:1;} }
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" data-app-root data-theme="{{ theme }}" style="background:var(--bg); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; min-height:100vh; position:relative; overflow-x:hidden; font-weight:300; transition:background .5s ease, color .5s ease;">
+
+  <div aria-hidden="true" style="position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;">
+    <div class="t24-blob" style="width:640px; height:640px; top:-180px; left:-130px; background:var(--blob-a); animation:floatA 22s ease-in-out infinite alternate;"></div>
+    <div class="t24-blob" style="width:580px; height:580px; top:-90px; right:-110px; background:var(--blob-b); animation:floatB 27s ease-in-out infinite alternate;"></div>
+    <div class="t24-blob" style="width:540px; height:540px; bottom:-180px; left:18%; background:var(--blob-c); animation:floatC 31s ease-in-out infinite alternate;"></div>
+    <div class="t24-blob" style="width:500px; height:500px; bottom:-130px; right:8%; background:var(--blob-d); animation:floatD 25s ease-in-out infinite alternate;"></div>
+  </div>
+
+  <!-- NAV -->
+  <nav style="position:relative; max-width:1240px; margin:0 auto; padding:30px 48px 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px;">
+    <div style="display:flex; align-items:baseline; gap:9px; cursor:pointer;" onClick="{{ goClock }}">
+      <span style="font-family:'Marcellus',serif; font-size:23px; letter-spacing:5px;">TIME</span>
+      <span style="font-family:'Marcellus',serif; font-size:23px; letter-spacing:5px; color:var(--accent);">24</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:26px; flex-wrap:wrap;">
+      <div style="display:flex; gap:24px; font-size:12.5px; letter-spacing:1.5px; text-transform:uppercase; flex-wrap:wrap;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="8">
+          <span onClick="{{ t.onClick }}" style="cursor:pointer; padding-bottom:6px; transition:color .2s; color:{{ t.color }}; border-bottom:1px solid {{ t.border }};">{{ t.label }}</span>
+        </sc-for>
+      </div>
+      <div style="display:flex; align-items:center; gap:3px; padding:3px; border:1px solid rgba(var(--fg-rgb),0.18); border-radius:14px;">
+        <sc-for list="{{ skins }}" as="sk" hint-placeholder-count="3">
+          <button onClick="{{ sk.onClick }}" style="background:{{ sk.bg }}; color:{{ sk.color }}; border:none; font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1px; padding:6px 12px; border-radius:11px; cursor:pointer;">{{ sk.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ toggleFormat }}" style="background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgba(var(--fg-rgb),0.7); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1.5px; padding:7px 12px; border-radius:12px; cursor:pointer;">{{ formatLabel }}</button>
+      <button onClick="{{ toggleTheme }}" title="Toggle theme" style="background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgba(var(--fg-rgb),0.7); font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1.5px; padding:7px 12px; border-radius:12px; cursor:pointer; display:flex; align-items:center; gap:7px;"><span style="font-size:13px;">{{ themeIcon }}</span>{{ themeLabel }}</button>
+    </div>
+  </nav>
+  <div style="max-width:1240px; margin:18px auto 0; height:1px; background:rgba(var(--fg-rgb),0.1);"></div>
+
+  <!-- ===================== CLOCK ===================== -->
+  <sc-if value="{{ isClock }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <!-- HERO -->
+    <section style="max-width:1240px; margin:26px auto 0; padding:0 48px;">
+      <div style="position:relative; border-radius:30px; overflow:hidden; min-height:480px; display:flex; flex-direction:column; justify-content:flex-end; padding:44px; box-shadow:var(--shadow);">
+        <div style="position:absolute; inset:0; background:var(--grad); z-index:0;"></div>
+        <div style="position:absolute; inset:0; background:radial-gradient(120% 90% at 20% 0%, rgba(0,0,0,0.05), transparent 45%), linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.52) 100%); z-index:1;"></div>
+
+        <div style="position:absolute; top:34px; left:44px; right:44px; display:flex; align-items:center; justify-content:space-between; z-index:2;">
+          <span style="display:inline-flex; align-items:center; gap:9px; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.9);"><span style="width:7px; height:7px; border-radius:50%; background:#fff; box-shadow:0 0 12px rgba(255,255,255,0.9);"></span>Live · World Clock</span>
+          <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 15px; border-radius:40px; background:rgba(255,255,255,0.14); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.25); font-size:12px; letter-spacing:1px; color:#fff;"><span data-field="herozone">Local</span> · <span data-field="herohm">00:00</span></span>
+        </div>
+
+        <div style="position:relative; z-index:2; max-width:640px; margin-top:26px;">
+          <h1 style="margin:0; font-family:'Marcellus',serif; font-weight:400; font-size:64px; line-height:1.02; letter-spacing:-1px; color:#fff; text-wrap:balance;">Keep the whole world<br>on your clock.</h1>
+          <p style="margin:20px 0 0; max-width:480px; font-size:16px; line-height:1.7; color:rgba(255,255,255,0.82);">Track cities across every timezone, convert meeting times in a tap, and never miss the overlap again.</p>
+        </div>
+
+        <!-- FLOATING CARD -->
+        <div style="position:relative; z-index:2; margin-top:40px; align-self:stretch; display:flex; flex-wrap:wrap; align-items:flex-end; gap:22px; padding:22px 26px; border-radius:20px; background:rgba(12,10,22,0.5); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.16); box-shadow:0 20px 50px -24px rgba(0,0,0,0.7);">
+          <div style="flex:1; min-width:150px;">
+            <div style="font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:9px;">From</div>
+            <select data-tz-select value="{{ fromZone }}" onChange="{{ onFrom }}" style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; font-family:'Jost',sans-serif; font-size:14px; letter-spacing:0.5px; padding:12px 14px; border-radius:12px; cursor:pointer;">
+              <sc-for list="{{ tzAbbr }}" as="z" hint-placeholder-count="12"><option value="{{ z.id }}" style="color:#111;">{{ z.label }}</option></sc-for>
+            </select>
+          </div>
+          <div style="flex:none; padding-bottom:12px; color:rgba(255,255,255,0.7); font-size:16px;">→</div>
+          <div style="flex:1; min-width:150px;">
+            <div style="font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:9px;">To</div>
+            <select data-tz-select value="{{ toZone }}" onChange="{{ onTo }}" style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; font-family:'Jost',sans-serif; font-size:14px; letter-spacing:0.5px; padding:12px 14px; border-radius:12px; cursor:pointer;">
+              <sc-for list="{{ tzAbbr }}" as="z" hint-placeholder-count="12"><option value="{{ z.id }}" style="color:#111;">{{ z.label }}</option></sc-for>
+            </select>
+          </div>
+          <button onClick="{{ goConverter }}" style="flex:none; background:#fff; border:none; color:#111; font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; padding:15px 26px; border-radius:12px; cursor:pointer;">Open converter</button>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1240px; margin:0 auto; padding:64px 48px 56px; display:grid; grid-template-columns:1.15fr 0.85fr; gap:64px; align-items:center;">
+      <div>
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:var(--grad);"></span>
+          <span style="font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--accent);">{{ localZoneLabel }}</span>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:8px; line-height:0.9; font-variant-numeric:tabular-nums;">
+          <span data-field="hm" style="font-size:112px; font-weight:200; letter-spacing:-2px;">00:00</span>
+          <span style="display:flex; align-items:baseline; gap:6px; padding-bottom:16px;">
+            <span data-field="sec" style="font-size:44px; font-weight:300; color:var(--accent);">:00</span>
+            <span data-field="ap" style="font-size:19px; font-weight:400; color:rgba(var(--fg-rgb),0.5); letter-spacing:1px;"></span>
+          </span>
+        </div>
+        <div data-field="date" style="margin-top:22px; font-size:19px; letter-spacing:1px; color:rgba(var(--fg-rgb),0.65);">—</div>
+        <div style="margin-top:40px; max-width:440px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:11px;">
+            <span style="font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Day Progress</span>
+            <span data-field="prog" style="font-size:11px; letter-spacing:2px; color:var(--accent);">0%</span>
+          </div>
+          <div style="height:1px; background:rgba(var(--fg-rgb),0.12); position:relative; overflow:hidden;">
+            <div data-bar style="position:absolute; left:0; top:0; height:100%; width:0%; background:var(--grad);"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <div style="position:relative; width:320px; height:320px; border-radius:50%; border:1px solid rgba(var(--fg-rgb),0.14); background:radial-gradient(circle at 50% 38%, rgba(255,255,255,0.025), transparent 60%);">
+          <div style="position:absolute; inset:0; transform:rotate(0deg);"><div style="position:absolute; left:50%; top:16px; transform:translateX(-50%); width:2px; height:14px; background:var(--grad);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(30deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(60deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(90deg);"><div style="position:absolute; left:50%; top:16px; transform:translateX(-50%); width:2px; height:14px; background:var(--grad);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(120deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(150deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(180deg);"><div style="position:absolute; left:50%; top:16px; transform:translateX(-50%); width:2px; height:14px; background:var(--grad);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(210deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(240deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(270deg);"><div style="position:absolute; left:50%; top:16px; transform:translateX(-50%); width:2px; height:14px; background:var(--grad);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(300deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div style="position:absolute; inset:0; transform:rotate(330deg);"><div style="position:absolute; left:50%; top:18px; transform:translateX(-50%); width:1px; height:8px; background:rgba(var(--fg-rgb),0.28);"></div></div>
+          <div data-hand="hour" style="position:absolute; left:50%; bottom:50%; width:3px; height:84px; background:rgb(var(--fg-rgb)); border-radius:3px; transform-origin:bottom center; transform:translateX(-50%);"></div>
+          <div data-hand="min" style="position:absolute; left:50%; bottom:50%; width:2px; height:120px; background:rgb(var(--fg-rgb)); border-radius:3px; transform-origin:bottom center; transform:translateX(-50%);"></div>
+          <div data-hand="sec" style="position:absolute; left:50%; bottom:50%; width:1px; height:132px; background:var(--grad); transform-origin:bottom center; transform:translateX(-50%);"></div>
+          <div style="position:absolute; left:50%; top:50%; width:11px; height:11px; border-radius:50%; background:var(--grad); transform:translate(-50%,-50%); box-shadow:0 0 0 3px rgba(8,6,16,0.55), 0 0 0 4px rgba(var(--accent-rgb),0.3);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLACE SEARCH -->
+    <section style="max-width:1240px; margin:0 auto; padding:0 48px 56px;">
+      <div style="position:relative;">
+        <div style="display:flex; align-items:center; gap:16px; border:1px solid rgba(var(--fg-rgb),0.16); background:var(--field); padding:4px 20px;">
+          <span style="font-size:18px; color:var(--accent);">⌕</span>
+          <input type="text" value="{{ search }}" onChange="{{ searchChange }}" placeholder="Search any city, state or country — London, Tokyo, California, Dubai…" style="flex:1; background:transparent; border:none; color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-weight:300; font-size:21px; letter-spacing:0.3px; padding:18px 0;">
+          <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ clearSearch }}" style="background:transparent; border:none; color:rgba(var(--fg-rgb),0.4); font-size:18px; cursor:pointer;" style-hover="color:rgb(var(--fg-rgb));">✕</button>
+          </sc-if>
+        </div>
+        <sc-if value="{{ hasQuery }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid rgba(var(--fg-rgb),0.12); border-top:none; background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow);">
+            <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ searchResults }}" as="r" hint-placeholder-count="3">
+                <div data-search-zone="{{ r.zone }}" style="display:flex; align-items:center; gap:22px; padding:20px 24px; border-bottom:1px solid rgba(var(--fg-rgb),0.07); transition:background .2s;" style-hover="background:var(--field);">
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-family:'Marcellus',serif; font-size:21px;">{{ r.name }}</div>
+                    <div style="font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:4px;">{{ r.region }} · {{ r.gmt }}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div data-field="srtime" style="font-size:34px; font-weight:200; font-variant-numeric:tabular-nums; letter-spacing:-0.5px;">—</div>
+                    <div data-field="srday" style="font-size:11px; letter-spacing:1px; color:rgba(var(--fg-rgb),0.45); margin-top:2px;">—</div>
+                  </div>
+                  <button onClick="{{ r.onPin }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgba(var(--fg-rgb),0.75); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; padding:9px 16px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">+ Pin</button>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:28px 24px; color:rgba(var(--fg-rgb),0.4); font-size:15px; letter-spacing:0.5px;">No place found for “{{ search }}”. Try a city, state, or country name.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <!-- DID YOU KNOW -->
+    <section style="max-width:1240px; margin:0 auto; padding:0 48px 56px;">
+      <div style="border-top:1px solid rgba(var(--fg-rgb),0.1); border-bottom:1px solid rgba(var(--fg-rgb),0.1); padding:18px 4px; display:flex; align-items:center; gap:16px;">
+        <span style="font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:var(--accent); white-space:nowrap;">Did you know</span>
+        <span style="width:1px; height:14px; background:rgba(var(--fg-rgb),0.18);"></span>
+        <span style="font-size:15px; color:rgba(var(--fg-rgb),0.7); letter-spacing:0.3px;">{{ fact }}</span>
+      </div>
+    </section>
+
+    <!-- STATS + FORMATS + SUN -->
+    <section style="max-width:1240px; margin:0 auto; padding:0 48px 70px; display:grid; grid-template-columns:1fr 1fr; gap:36px;">
+      <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:34px 36px;">
+        <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:26px;">Timestamps &amp; Date</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px 30px; margin-bottom:30px;">
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Day of Year</div><div data-field="doy" style="font-family:'Marcellus',serif; font-size:26px; margin-top:6px;">—</div></div>
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Week No.</div><div data-field="week" style="font-family:'Marcellus',serif; font-size:26px; margin-top:6px;">—</div></div>
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">UTC Offset</div><div data-field="utc" style="font-family:'Marcellus',serif; font-size:26px; margin-top:6px;">—</div></div>
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Year Progress</div><div data-field="yearprog" style="font-family:'Marcellus',serif; font-size:26px; margin-top:6px;">—</div></div>
+        </div>
+        <div style="height:1px; background:rgba(var(--fg-rgb),0.1); margin-bottom:24px;"></div>
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px;">
+            <div style="min-width:0;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Unix</div><div data-field="unix" style="font-variant-numeric:tabular-nums; font-size:17px; margin-top:3px;">—</div></div>
+            <button onClick="{{ copyUnix }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.65); font-family:'Jost',sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:6px 12px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">Copy</button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px;">
+            <div style="min-width:0;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">ISO 8601</div><div data-field="iso" style="font-variant-numeric:tabular-nums; font-size:15px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div></div>
+            <button onClick="{{ copyIso }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.65); font-family:'Jost',sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:6px 12px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">Copy</button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px;">
+            <div style="min-width:0;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">RFC 2822</div><div data-field="rfc" style="font-size:15px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">—</div></div>
+            <button onClick="{{ copyRfc }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.65); font-family:'Jost',sans-serif; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; padding:6px 12px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:34px 36px; display:flex; flex-direction:column;">
+        <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:26px;">Sun &amp; Moon</div>
+        <div style="display:flex; align-items:center; gap:32px; margin-bottom:30px;">
+          <div style="position:relative; width:96px; height:96px; flex:none; border-radius:50%; overflow:hidden; box-shadow:0 0 0 1px rgba(var(--fg-rgb),0.16), 0 10px 26px -8px rgba(0,0,0,0.7), inset 0 0 14px 2px rgba(0,0,0,0.4);">
+            <div style="position:absolute; inset:0; border-radius:50%; background-color:#0b1019; background-image:url('assets/moon.png'); background-repeat:no-repeat; background-size:180px 101.25px; background-position:-42px -2.7px;"></div>
+            <svg viewBox="-50 -50 100 100" style="position:absolute; inset:0; width:100%; height:100%;">
+              <defs>
+                <filter id="moonTerm" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.1"></feGaussianBlur></filter>
+                <clipPath id="moonDisc"><circle r="50"></circle></clipPath>
+              </defs>
+              <g clipPath="url(#moonDisc)"><path d="{{ moonShadowPath }}" fill="#070a11" fillOpacity="0.93" filter="url(#moonTerm)"></path></g>
+            </svg>
+            <div style="position:absolute; inset:0; border-radius:50%; pointer-events:none; background:radial-gradient(circle at 72% 74%, rgba(0,0,0,0.28), transparent 62%);"></div>
+          </div>
+          <div>
+            <div style="font-family:'Marcellus',serif; font-size:22px;">{{ moonName }}</div>
+            <div style="font-size:13px; color:rgba(var(--fg-rgb),0.55); margin-top:6px;">{{ moonLitPct }}% illuminated</div>
+          </div>
+        </div>
+        <div style="height:1px; background:rgba(var(--fg-rgb),0.1); margin-bottom:24px;"></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;">
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Sunrise</div><div style="font-family:'Marcellus',serif; font-size:24px; margin-top:6px;">{{ sunrise }}</div></div>
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Sunset</div><div style="font-family:'Marcellus',serif; font-size:24px; margin-top:6px;">{{ sunset }}</div></div>
+          <div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Daylight</div><div style="font-family:'Marcellus',serif; font-size:24px; margin-top:6px;">{{ daylight }}</div></div>
+        </div>
+        <div style="margin-top:auto; padding-top:24px; font-size:11px; letter-spacing:1.5px; color:rgba(var(--fg-rgb),0.35);">{{ sunLocLabel }}</div>
+      </div>
+    </section>
+
+    <div style="max-width:1240px; margin:0 auto; height:1px; background:rgba(var(--fg-rgb),0.1);"></div>
+    <section style="max-width:1240px; margin:0 auto; padding:64px 48px 80px;">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:14px;">
+        <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">World Clock</h2>
+        <span style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Your pinned cities</span>
+      </div>
+      <div style="margin-bottom:26px; position:relative;">
+        <div style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; padding:6px 18px; border:1px solid rgba(var(--fg-rgb),0.1);">
+          <span style="font-size:16px; color:var(--accent);">⌕</span>
+          <input type="text" value="{{ pinSearch }}" onChange="{{ pinSearchChange }}" placeholder="Search a city, state or country to pin…" style="flex:2; min-width:220px; background:transparent; border:none; color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:16px; padding:12px 0;">
+          <span style="width:1px; height:22px; background:rgba(var(--fg-rgb),0.14);"></span>
+          <input type="text" value="{{ newPinLabel }}" onChange="{{ newPinLabelChange }}" placeholder="Custom label (optional, e.g. Mom · Toronto)" style="flex:1; min-width:200px; background:transparent; border:none; color:rgba(var(--fg-rgb),0.85); font-family:'Jost',sans-serif; font-size:15px; padding:12px 0;">
+        </div>
+        <sc-if value="{{ hasPinQuery }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid rgba(var(--fg-rgb),0.12); border-top:none; background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow);">
+            <sc-if value="{{ hasPinResults }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ pinSearchResults }}" as="r" hint-placeholder-count="3">
+                <div data-search-zone="{{ r.zone }}" onClick="{{ r.onPin }}" style="display:flex; align-items:center; gap:18px; padding:16px 22px; border-bottom:1px solid rgba(var(--fg-rgb),0.07); cursor:pointer; transition:background .2s;" style-hover="background:var(--field);">
+                  <div style="flex:1; min-width:0;">
+                    <div style="font-family:'Marcellus',serif; font-size:18px;">{{ r.name }}</div>
+                    <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:3px;">{{ r.region }} · {{ r.gmt }}</div>
+                  </div>
+                  <div data-field="srtime" style="font-size:26px; font-weight:200; font-variant-numeric:tabular-nums; letter-spacing:-0.5px;">—</div>
+                  <span style="flex:none; color:var(--accent); font-size:11px; letter-spacing:1.5px; text-transform:uppercase;">+ Pin</span>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{ noPinResults }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:20px 22px; color:rgba(var(--fg-rgb),0.4); font-size:14px;">No place found for “{{ pinSearch }}”.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1);">
+        <sc-for list="{{ pinnedView }}" as="c" hint-placeholder-count="6">
+          <div data-city data-zone="{{ c.zone }}" style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:30px 30px; transition:background .3s; position:relative;" style-hover="background:var(--field);">
+            <button onClick="{{ c.onRemove }}" title="Remove" style="position:absolute; top:14px; right:14px; background:transparent; border:none; color:rgba(var(--fg-rgb),0.3); font-size:14px; cursor:pointer;" style-hover="color:#cf6a61;">✕</button>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-right:18px;">
+              <div style="min-width:0;">
+                <div style="font-family:'Marcellus',serif; font-size:20px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.name }}</div>
+                <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:5px;">{{ c.sub }}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:7px; flex:none;">
+                <span data-field="dot" style="width:6px; height:6px; border-radius:50%; background:rgba(var(--fg-rgb),0.25);"></span>
+                <span data-field="state" style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.45);">—</span>
+              </div>
+            </div>
+            <div data-field="time" style="font-size:38px; font-weight:200; letter-spacing:-0.5px; font-variant-numeric:tabular-nums;">00:00:00</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  <!-- ===================== STOPWATCH ===================== -->
+  <sc-if value="{{ isStopwatch }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:920px; margin:0 auto; padding:80px 48px 90px;">
+    <div style="text-align:center;">
+      <div style="font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:36px;">Stopwatch</div>
+      <div data-sw-time style="font-size:130px; font-weight:200; letter-spacing:-3px; font-variant-numeric:tabular-nums; line-height:1;">00:00.00</div>
+      <div style="display:flex; justify-content:center; gap:16px; margin-top:48px;">
+        <button onClick="{{ swToggle }}" style="min-width:150px; padding:16px 30px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;">{{ swBtnLabel }}</button>
+        <button onClick="{{ swLap }}" style="min-width:130px; padding:16px 30px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.2); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">Lap</button>
+        <button onClick="{{ swReset }}" style="min-width:130px; padding:16px 30px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.2); color:rgba(var(--fg-rgb),0.7); font-family:'Jost',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">Reset</button>
+      </div>
+    </div>
+    <sc-if value="{{ hasLaps }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:56px; border-top:1px solid rgba(var(--fg-rgb),0.1);">
+        <sc-for list="{{ laps }}" as="l" hint-placeholder-count="3">
+          <div style="display:grid; grid-template-columns:80px 1fr 1fr; padding:16px 6px; border-bottom:1px solid rgba(var(--fg-rgb),0.08); align-items:center;">
+            <span style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.45);">Lap {{ l.n }}</span>
+            <span style="font-variant-numeric:tabular-nums; font-size:20px; color:var(--accent);">{{ l.lap }}</span>
+            <span style="font-variant-numeric:tabular-nums; font-size:20px; text-align:right; color:rgba(var(--fg-rgb),0.6);">{{ l.total }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <!-- ===================== TIMER ===================== -->
+  <sc-if value="{{ isTimer }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:920px; margin:0 auto; padding:64px 48px 90px;">
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1); margin-bottom:48px;">
+      <div style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:22px 26px;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Focus Today</div><div style="font-family:'Marcellus',serif; font-size:30px; margin-top:6px;"><span style="color:var(--accent);">{{ focusToday }}</span> sessions</div></div>
+      <div style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:22px 26px;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Streak</div><div style="font-family:'Marcellus',serif; font-size:30px; margin-top:6px;"><span style="color:var(--accent);">{{ focusStreak }}</span> days</div></div>
+      <div style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:22px 26px;"><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">All Time</div><div style="font-family:'Marcellus',serif; font-size:30px; margin-top:6px;"><span style="color:var(--accent);">{{ focusTotal }}</span> done</div></div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:12px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:30px;">Countdown Timer</div>
+      <div style="position:relative; display:inline-block;">
+        <div data-tm-time style="font-size:128px; font-weight:200; letter-spacing:-3px; font-variant-numeric:tabular-nums; line-height:1;">00:00</div>
+        <div style="height:2px; background:rgba(var(--fg-rgb),0.12); margin-top:14px; position:relative; overflow:hidden;"><div data-tm-bar style="position:absolute; left:0; top:0; height:100%; width:0%; background:var(--grad);"></div></div>
+      </div>
+      <div style="display:flex; justify-content:center; gap:10px; margin-top:40px; flex-wrap:wrap;">
+        <sc-for list="{{ timerPresets }}" as="p" hint-placeholder-count="6">
+          <button onClick="{{ p.onClick }}" style="padding:11px 20px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.75); font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1.5px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">{{ p.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex; justify-content:center; align-items:center; gap:10px; margin-top:28px;">
+        <input type="number" min="0" max="99" value="{{ tmH }}" onChange="{{ tmHChange }}" style="width:78px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; text-align:center; padding:11px 8px; border-radius:12px;">
+        <span style="color:rgba(var(--fg-rgb),0.4);">h</span>
+        <input type="number" min="0" max="59" value="{{ tmM }}" onChange="{{ tmMChange }}" style="width:78px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; text-align:center; padding:11px 8px; border-radius:12px;">
+        <span style="color:rgba(var(--fg-rgb),0.4);">m</span>
+        <input type="number" min="0" max="59" value="{{ tmS }}" onChange="{{ tmSChange }}" style="width:78px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; text-align:center; padding:11px 8px; border-radius:12px;">
+        <span style="color:rgba(var(--fg-rgb),0.4);">s</span>
+      </div>
+      <div style="display:flex; justify-content:center; gap:16px; margin-top:40px;">
+        <button onClick="{{ tmToggle }}" style="min-width:150px; padding:16px 30px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;">{{ tmBtnLabel }}</button>
+        <button onClick="{{ tmReset }}" style="min-width:130px; padding:16px 30px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.2); color:rgba(var(--fg-rgb),0.7); font-family:'Jost',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">Reset</button>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===================== TASKS ===================== -->
+  <sc-if value="{{ isTasks }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:1000px; margin:0 auto; padding:72px 48px 90px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
+      <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">Task Timers</h2>
+      <span style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Get notified when done</span>
+    </div>
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:26px 28px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:34px;">
+      <input type="text" value="{{ taskName }}" onChange="{{ taskNameChange }}" placeholder="What are you working on?" style="flex:1; min-width:220px; background:transparent; border:none; border-bottom:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; padding:8px 2px;">
+      <div style="display:flex; gap:8px;">
+        <sc-for list="{{ taskPresets }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.onClick }}" style="padding:9px 15px; background:{{ p.bg }}; border:1px solid {{ p.border }}; color:{{ p.color }}; font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1px; border-radius:12px; cursor:pointer;">{{ p.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ addTask }}" style="padding:11px 22px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;">+ Add</button>
+    </div>
+    <sc-if value="{{ hasTasks }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1);">
+        <sc-for list="{{ tasks }}" as="t" hint-placeholder-count="2">
+          <div data-task-id="{{ t.id }}" style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:24px 28px; display:flex; align-items:center; gap:24px;">
+            <span data-field="taskdot" style="width:8px; height:8px; border-radius:50%; flex:none; background:{{ t.dotColor }};"></span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:19px; letter-spacing:0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ t.name }}</div>
+              <div style="height:2px; background:rgba(var(--fg-rgb),0.1); margin-top:12px; position:relative; overflow:hidden;"><div data-field="taskbar" style="position:absolute; left:0; top:0; height:100%; width:0%; background:var(--grad);"></div></div>
+            </div>
+            <div data-field="taskremain" style="font-variant-numeric:tabular-nums; font-size:30px; font-weight:200; min-width:120px; text-align:right;">00:00</div>
+            <button onClick="{{ t.onDelete }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.5); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1px; text-transform:uppercase; padding:7px 12px; border-radius:12px; cursor:pointer;" style-hover="border-color:#b5564e; color:#cf6a61;">Remove</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noTasks }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px dashed rgba(var(--fg-rgb),0.14); padding:64px; text-align:center;">
+        <div style="font-family:'Marcellus',serif; font-size:22px; color:rgba(var(--fg-rgb),0.5);">No tasks yet</div>
+        <div style="font-size:13px; color:rgba(var(--fg-rgb),0.35); margin-top:10px; letter-spacing:1px;">Name a task and pick a duration to begin</div>
+      </div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <!-- ===================== CALENDAR ===================== -->
+  <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:1240px; margin:0 auto; padding:72px 48px 90px; display:grid; grid-template-columns:1.5fr 1fr; gap:44px; align-items:start;">
+    <div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:30px;">
+        <div style="display:flex; align-items:baseline; gap:14px;">
+          <h2 style="margin:0; font-family:'Marcellus',serif; font-size:34px; font-weight:400;">{{ calMonthName }}</h2>
+          <span style="font-family:'Marcellus',serif; font-size:34px; font-weight:400; color:var(--accent);">{{ calYear }}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button onClick="{{ calPrev }}" style="width:40px; height:40px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgb(var(--fg-rgb)); font-size:16px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">‹</button>
+          <button onClick="{{ calToday }}" style="padding:0 16px; height:40px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgba(var(--fg-rgb),0.75); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">Today</button>
+          <button onClick="{{ calNext }}" style="width:40px; height:40px; background:transparent; border:1px solid rgba(var(--fg-rgb),0.18); color:rgb(var(--fg-rgb)); font-size:16px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent);">›</button>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:1px; background:rgba(var(--fg-rgb),0.08); border:1px solid rgba(var(--fg-rgb),0.08);">
+        <sc-for list="{{ weekdays }}" as="w" hint-placeholder-count="7">
+          <div style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:12px 0; text-align:center; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">{{ w }}</div>
+        </sc-for>
+        <sc-for list="{{ calCells }}" as="d" hint-placeholder-count="35">
+          <div onClick="{{ d.onClick }}" style="background:{{ d.bg }}; min-height:78px; padding:9px 11px; cursor:{{ d.cursor }}; position:relative; border:1px solid {{ d.ring }};">
+            <span style="font-size:15px; font-variant-numeric:tabular-nums; color:{{ d.color }};">{{ d.day }}</span>
+            <sc-if value="{{ d.hasEvents }}" hint-placeholder-val="{{ false }}">
+              <span style="position:absolute; bottom:9px; left:11px; width:5px; height:5px; border-radius:50%; background:var(--grad);"></span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:32px 30px; min-height:420px; display:flex; flex-direction:column;">
+      <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:8px;">Selected</div>
+      <div style="font-family:'Marcellus',serif; font-size:26px; margin-bottom:24px;">{{ selectedLabel }}</div>
+      <div style="display:flex; gap:10px; margin-bottom:24px;">
+        <input type="text" value="{{ evtTitle }}" onChange="{{ evtTitleChange }}" placeholder="Add an event…" style="flex:1; background:transparent; border:none; border-bottom:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:16px; padding:8px 2px;">
+        <input type="time" value="{{ evtTime }}" onChange="{{ evtTimeChange }}" style="width:108px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:14px; padding:8px; border-radius:12px;">
+        <button onClick="{{ addEvent }}" style="padding:0 16px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:18px; border-radius:12px; cursor:pointer;">+</button>
+      </div>
+      <sc-if value="{{ hasSelEvents }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ selEvents }}" as="e" hint-placeholder-count="2">
+            <div style="display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid rgba(var(--fg-rgb),0.1); background:rgba(255,255,255,0.012);">
+              <span style="width:6px; height:6px; border-radius:50%; background:var(--grad); flex:none;"></span>
+              <span style="font-variant-numeric:tabular-nums; font-size:13px; color:var(--accent); min-width:50px;">{{ e.time }}</span>
+              <span style="flex:1; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ e.title }}</span>
+              <button onClick="{{ e.onDelete }}" style="flex:none; background:transparent; border:none; color:rgba(var(--fg-rgb),0.4); font-size:16px; cursor:pointer;" style-hover="color:#cf6a61;">✕</button>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noSelEvents }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; color:rgba(var(--fg-rgb),0.3); font-size:13px; letter-spacing:1px;">No events on this day</div>
+      </sc-if>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===================== COUNTDOWNS ===================== -->
+  <sc-if value="{{ isCountdowns }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:1000px; margin:0 auto; padding:72px 48px 90px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
+      <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">Countdowns</h2>
+      <span style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Count the moments that matter</span>
+    </div>
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:26px 28px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:34px;">
+      <input type="text" value="{{ cdTitle }}" onChange="{{ cdTitleChange }}" placeholder="Event name (e.g. Product launch)" style="flex:1; min-width:200px; background:transparent; border:none; border-bottom:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; padding:8px 2px;">
+      <input type="date" value="{{ cdDate }}" onChange="{{ cdDateChange }}" style="background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:14px; padding:10px 12px; border-radius:12px;">
+      <input type="time" value="{{ cdTime }}" onChange="{{ cdTimeChange }}" style="width:108px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:14px; padding:10px 8px; border-radius:12px;">
+      <button onClick="{{ addCountdown }}" style="padding:12px 22px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;">+ Add</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:18px;">
+      <sc-for list="{{ countdownsView }}" as="c" hint-placeholder-count="2">
+        <div data-cd-card data-target="{{ c.target }}" style="border:1px solid rgba(var(--fg-rgb),0.12); padding:30px 34px; background:var(--panel); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); box-shadow:var(--shadow);">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;">
+            <div style="font-family:'Marcellus',serif; font-size:24px;">{{ c.title }}</div>
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.45);">{{ c.dateLabel }}</span>
+              <sc-if value="{{ c.removable }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ c.onDelete }}" style="background:transparent; border:none; color:rgba(var(--fg-rgb),0.35); font-size:15px; cursor:pointer;" style-hover="color:#cf6a61;">✕</button>
+              </sc-if>
+            </div>
+          </div>
+          <div style="display:flex; gap:34px;">
+            <div style="text-align:center;"><div data-cd-d style="font-size:54px; font-weight:200; font-variant-numeric:tabular-nums; line-height:1; color:var(--accent);">0</div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:8px;">Days</div></div>
+            <div style="text-align:center;"><div data-cd-h style="font-size:54px; font-weight:200; font-variant-numeric:tabular-nums; line-height:1;">00</div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:8px;">Hours</div></div>
+            <div style="text-align:center;"><div data-cd-m style="font-size:54px; font-weight:200; font-variant-numeric:tabular-nums; line-height:1;">00</div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:8px;">Minutes</div></div>
+            <div style="text-align:center;"><div data-cd-s style="font-size:54px; font-weight:200; font-variant-numeric:tabular-nums; line-height:1;">00</div><div style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:8px;">Seconds</div></div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===================== CONVERTER ===================== -->
+  <sc-if value="{{ isConverter }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:1240px; margin:0 auto; padding:72px 48px 96px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:46px; flex-wrap:wrap; gap:14px;">
+      <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">Time Converter</h2>
+      <button onClick="{{ shareTime }}" style="background:transparent; border:1px solid rgba(var(--fg-rgb),0.2); color:rgba(var(--fg-rgb),0.8); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; padding:9px 18px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">↗ Share this time</button>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:22px;">
+      <span style="font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.35); margin-right:4px;">Quick pairs</span>
+      <select data-tz-select value="{{ fromZone }}" onChange="{{ onFrom }}" style="background:var(--field); border:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1px; padding:9px 32px 9px 14px; border-radius:12px; cursor:pointer; font-variant-numeric:tabular-nums;">
+        <sc-for list="{{ tzAbbr }}" as="z" hint-placeholder-count="12"><option value="{{ z.id }}">{{ z.label }}</option></sc-for>
+      </select>
+      <span style="font-size:13px; color:var(--accent);">→</span>
+      <select data-tz-select value="{{ toZone }}" onChange="{{ onTo }}" style="background:var(--field); border:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1px; padding:9px 32px 9px 14px; border-radius:12px; cursor:pointer; font-variant-numeric:tabular-nums;">
+        <sc-for list="{{ tzAbbr }}" as="z" hint-placeholder-count="12"><option value="{{ z.id }}">{{ z.label }}</option></sc-for>
+      </select>
+    </div>
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); background:var(--panel); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); box-shadow:var(--shadow); display:grid; grid-template-columns:1fr auto 1fr;">
+      <div style="padding:46px 44px;">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:20px;"><span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">From</span><span style="font-size:11px; letter-spacing:1.5px; color:var(--accent); font-variant-numeric:tabular-nums;">{{ fromAbbr }}</span></div>
+        <select data-tz-select value="{{ fromZone }}" onChange="{{ onFrom }}" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; padding:13px 14px; border-radius:12px; cursor:pointer;">
+          <sc-for list="{{ zoneOptions }}" as="z" hint-placeholder-count="14"><option value="{{ z.id }}">{{ z.label }}</option></sc-for>
+        </select>
+        <div style="margin-top:26px;">
+          <input type="time" value="{{ fromTime }}" onChange="{{ onFromTime }}" style="width:100%; background:transparent; border:none; border-bottom:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-weight:200; font-size:54px; letter-spacing:-1px; padding:6px 0; font-variant-numeric:tabular-nums; font-family:'Jost',sans-serif;">
+        </div>
+        <div style="margin-top:18px; display:flex; align-items:center; gap:16px;">
+          <span style="font-size:14px; color:rgba(var(--fg-rgb),0.55);">{{ fromDateStr }}</span>
+          <button onClick="{{ onNow }}" style="background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.7); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; padding:6px 14px; border-radius:12px; cursor:pointer;" style-hover="border-color:var(--accent); color:var(--accent);">Now</button>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 8px; border-left:1px solid rgba(var(--fg-rgb),0.1); border-right:1px solid rgba(var(--fg-rgb),0.1);">
+        <button onClick="{{ onSwap }}" title="Swap" style="width:52px; height:52px; border-radius:50%; border:1px solid rgba(var(--fg-rgb),0.16); background:var(--field); color:var(--accent); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .3s;" style-hover="border-color:var(--accent); transform:rotate(180deg);">⇄</button>
+        <div style="margin-top:18px; font-size:12px; letter-spacing:1.5px; color:rgba(var(--fg-rgb),0.5); writing-mode:vertical-rl; transform:rotate(180deg);">{{ offsetStr }}</div>
+      </div>
+      <div style="padding:46px 44px; background:rgba(var(--accent-rgb),0.02);">
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:20px;"><span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--accent);">To</span><span style="font-size:11px; letter-spacing:1.5px; color:var(--accent); font-variant-numeric:tabular-nums;">{{ toAbbr }}</span></div>
+        <select data-tz-select value="{{ toZone }}" onChange="{{ onTo }}" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; padding:13px 14px; border-radius:12px; cursor:pointer;">
+          <sc-for list="{{ zoneOptions }}" as="z" hint-placeholder-count="14"><option value="{{ z.id }}">{{ z.label }}</option></sc-for>
+        </select>
+        <div style="margin-top:26px; display:flex; align-items:flex-end; gap:10px; border-bottom:1px solid rgba(var(--fg-rgb),0.16); padding:6px 0;">
+          <span style="font-weight:200; font-size:54px; letter-spacing:-1px; font-variant-numeric:tabular-nums;">{{ convertedTime }}</span>
+          <span style="font-size:18px; font-weight:400; color:var(--accent); letter-spacing:1px; padding-bottom:12px;">{{ convertedAp }}</span>
+        </div>
+        <div style="margin-top:18px; display:flex; align-items:center; gap:14px;">
+          <span style="font-size:14px; color:rgba(var(--fg-rgb),0.55);">{{ convertedDate }}</span>
+          <span style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); border:1px solid rgba(var(--accent-rgb),0.35); padding:3px 10px; border-radius:12px;">{{ dayDeltaStr }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERLAP -->
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); border-top:none; padding:34px 44px;">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
+        <span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Working-hours overlap</span>
+        <span style="font-size:13px; color:rgba(var(--fg-rgb),0.6);"><span style="color:var(--accent); font-size:18px; font-family:'Marcellus',serif;">{{ overlapHours }}</span> shared business hours · 9–5</span>
+      </div>
+      <div style="margin-bottom:28px;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:16px;">
+          <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;">
+            <span style="font-family:'Marcellus',serif; font-size:30px; font-variant-numeric:tabular-nums;">{{ meetFromLabel }}</span>
+            <span style="font-size:13px; letter-spacing:0.5px; color:rgba(var(--fg-rgb),0.45);">in {{ fromCity }}</span>
+            <span style="color:var(--accent); font-size:18px; padding:0 4px;">→</span>
+            <span style="font-family:'Marcellus',serif; font-size:30px; color:var(--accent); font-variant-numeric:tabular-nums;">{{ meetToLabel }}</span>
+            <span style="font-size:13px; letter-spacing:0.5px; color:rgba(var(--fg-rgb),0.45);">in {{ toCity }}</span>
+          </div>
+          <span style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:{{ meetStatusColor }};">{{ meetStatus }}</span>
+        </div>
+        <input type="range" min="0" max="23.5" step="0.5" value="{{ meetHour }}" onChange="{{ meetHourChange }}" style="width:100%; accent-color:var(--accent); cursor:pointer;">
+        <div style="display:flex; justify-content:space-between; font-size:10px; letter-spacing:1px; color:rgba(var(--fg-rgb),0.3); margin-top:4px; font-variant-numeric:tabular-nums;"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>
+      </div>
+      <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.5); margin-bottom:8px;">{{ fromCity }}</div>
+      <div style="display:grid; grid-template-columns:repeat(24,1fr); gap:2px; margin-bottom:18px;">
+        <sc-for list="{{ fromCells }}" as="h" hint-placeholder-count="24">
+          <div onClick="{{ h.onClick }}" style="height:38px; display:flex; align-items:center; justify-content:center; font-size:11px; font-variant-numeric:tabular-nums; cursor:pointer; background:{{ h.bg }}; color:{{ h.color }}; border:{{ h.border }};">{{ h.label }}</div>
+        </sc-for>
+      </div>
+      <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.5); margin-bottom:8px;">{{ toCity }}</div>
+      <div style="display:grid; grid-template-columns:repeat(24,1fr); gap:2px;">
+        <sc-for list="{{ toCells }}" as="h" hint-placeholder-count="24">
+          <div onClick="{{ h.onClick }}" style="height:38px; display:flex; align-items:center; justify-content:center; font-size:11px; font-variant-numeric:tabular-nums; cursor:pointer; background:{{ h.bg }}; color:{{ h.color }}; border:{{ h.border }};">{{ h.label }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ===================== ALARM ===================== -->
+  <sc-if value="{{ isAlarm }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:900px; margin:0 auto; padding:72px 48px 90px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px;">
+      <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">Alarms</h2>
+      <span data-field="alarmnow" style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); font-variant-numeric:tabular-nums;">—</span>
+    </div>
+    <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:26px 28px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-bottom:34px;">
+      <input type="time" value="{{ alarmTime }}" onChange="{{ alarmTimeChange }}" style="width:140px; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:24px; font-weight:200; padding:10px 14px; border-radius:12px; font-variant-numeric:tabular-nums;">
+      <input type="text" value="{{ alarmLabel }}" onChange="{{ alarmLabelChange }}" placeholder="Label (optional)" style="flex:1; min-width:200px; background:transparent; border:none; border-bottom:1px solid rgba(var(--fg-rgb),0.16); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:18px; padding:8px 2px;">
+      <button onClick="{{ addAlarm }}" style="padding:12px 24px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;">+ Add Alarm</button>
+    </div>
+    <sc-if value="{{ hasAlarms }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1);">
+        <sc-for list="{{ alarms }}" as="a" hint-placeholder-count="2">
+          <div style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:24px 28px; display:flex; align-items:center; gap:24px;">
+            <div style="font-size:42px; font-weight:200; letter-spacing:-1px; font-variant-numeric:tabular-nums; color:{{ a.timeColor }}; min-width:130px;">{{ a.timeLabel }}</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; color:{{ a.labelColor }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ a.label }}</div>
+              <div style="font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-top:4px;">{{ a.status }}</div>
+            </div>
+            <button onClick="{{ a.onToggle }}" style="flex:none; width:54px; height:30px; border-radius:30px; border:1px solid {{ a.toggleBorder }}; background:{{ a.toggleBg }}; position:relative; cursor:pointer; transition:all .2s;">
+              <span style="position:absolute; top:3px; left:{{ a.knobLeft }}; width:22px; height:22px; border-radius:50%; background:{{ a.knobBg }}; transition:all .2s;"></span>
+            </button>
+            <button onClick="{{ a.onDelete }}" style="flex:none; background:transparent; border:1px solid rgba(var(--fg-rgb),0.16); color:rgba(var(--fg-rgb),0.5); font-family:'Jost',sans-serif; font-size:11px; letter-spacing:1px; text-transform:uppercase; padding:7px 12px; border-radius:12px; cursor:pointer;" style-hover="border-color:#b5564e; color:#cf6a61;">Delete</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ noAlarms }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px dashed rgba(var(--fg-rgb),0.14); padding:64px; text-align:center;">
+        <div style="font-family:'Marcellus',serif; font-size:22px; color:rgba(var(--fg-rgb),0.5);">No alarms set</div>
+        <div style="font-size:13px; color:rgba(var(--fg-rgb),0.35); margin-top:10px; letter-spacing:1px;">Pick a time above and add your first alarm</div>
+      </div>
+    </sc-if>
+  </section>
+  </sc-if>
+
+  <!-- ===================== CONTACT ===================== -->
+  <sc-if value="{{ isContact }}" hint-placeholder-val="{{ true }}">
+  <section style="max-width:920px; margin:0 auto; padding:72px 48px 90px;">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+      <h2 style="margin:0; font-family:'Marcellus',serif; font-size:32px; font-weight:400;">Get in touch</h2>
+      <span style="font-size:12px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">We read everything</span>
+    </div>
+    <p style="margin:0 0 38px; font-size:15px; line-height:1.7; color:rgba(var(--fg-rgb),0.55); max-width:560px;">Share feedback, report a bug, or request a feature. Tell us what would make TIME24 work better for you.</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:start;">
+      <div>
+        <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:16px;">What's this about?</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:30px;">
+          <sc-for list="{{ fbTypes }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.onClick }}" style="padding:9px 16px; background:{{ t.bg }}; border:1px solid {{ t.border }}; color:{{ t.color }}; font-family:'Jost',sans-serif; font-size:12px; letter-spacing:1px; border-radius:12px; cursor:pointer;">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px;">
+          <div>
+            <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:10px;">Name <span style="text-transform:none; letter-spacing:0; color:rgba(var(--fg-rgb),0.25);">(optional)</span></div>
+            <input type="text" value="{{ fbName }}" onChange="{{ fbNameChange }}" placeholder="Your name" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; padding:12px 14px; border-radius:12px; box-sizing:border-box;">
+          </div>
+          <div>
+            <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:10px;">Email <span style="text-transform:none; letter-spacing:0; color:rgba(var(--fg-rgb),0.25);">(optional)</span></div>
+            <input type="email" value="{{ fbEmail }}" onChange="{{ fbEmailChange }}" placeholder="you@email.com" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; padding:12px 14px; border-radius:12px; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:10px;">Message</div>
+        <textarea value="{{ fbMsg }}" onChange="{{ fbMsgChange }}" placeholder="Tell us what's on your mind…" rows="6" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; line-height:1.6; padding:14px; border-radius:12px; box-sizing:border-box; resize:vertical;"></textarea>
+
+        <button onClick="{{ submitFeedback }}" style="margin-top:22px; padding:14px 30px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;">Send message</button>
+      </div>
+
+      <div style="border-left:1px solid rgba(var(--fg-rgb),0.1); padding-left:44px;">
+        <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:18px;">Your submissions</div>
+        <sc-if value="{{ hasFeedbacks }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <sc-for list="{{ feedbacksView }}" as="f" hint-placeholder-count="2">
+              <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:18px 20px; background:var(--panel); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); box-shadow:var(--shadow);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                  <span style="font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--accent);">{{ f.type }}</span>
+                  <button onClick="{{ f.onDelete }}" style="background:transparent; border:none; color:rgba(var(--fg-rgb),0.3); font-size:14px; cursor:pointer;" style-hover="color:#cf6a61;">✕</button>
+                </div>
+                <div style="font-size:14px; line-height:1.6; color:rgba(var(--fg-rgb),0.85);">{{ f.msg }}</div>
+                <div style="font-size:11px; letter-spacing:1px; color:rgba(var(--fg-rgb),0.35); margin-top:12px;">{{ f.who }} · {{ f.when }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ noFeedbacks }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px dashed rgba(var(--fg-rgb),0.14); padding:44px 28px; text-align:center;">
+            <div style="font-family:'Marcellus',serif; font-size:19px; color:rgba(var(--fg-rgb),0.5);">Nothing sent yet</div>
+            <div style="font-size:13px; color:rgba(var(--fg-rgb),0.35); margin-top:8px; letter-spacing:0.5px; line-height:1.6;">Your messages appear here after you send them.</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- FOOTER -->
+  <div style="max-width:1240px; margin:0 auto; height:1px; background:rgba(var(--fg-rgb),0.1);"></div>
+  <footer style="max-width:1240px; margin:0 auto; padding:34px 48px 54px; display:flex; align-items:center; justify-content:space-between; font-size:12px; letter-spacing:1.5px; color:rgba(var(--fg-rgb),0.35); text-transform:uppercase; flex-wrap:wrap; gap:12px;">
+    <div style="display:flex; align-items:baseline; gap:7px;"><span style="font-family:'Marcellus',serif; letter-spacing:4px;">TIME</span><span style="font-family:'Marcellus',serif; letter-spacing:4px; color:var(--accent);">24</span></div>
+    <span>Precision time, beautifully kept</span>
+  </footer>
+
+  <!-- TOAST -->
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:32px; left:50%; transform:translateX(-50%); background:var(--field); border:1px solid var(--accent); color:rgb(var(--fg-rgb)); padding:14px 26px; font-size:13px; letter-spacing:1px; border-radius:12px; z-index:60; box-shadow:0 8px 30px rgba(0,0,0,0.5);">{{ toast }}</div>
+  </sc-if>
+
+  <!-- RING OVERLAY -->
+  <sc-if value="{{ isRinging }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; background:rgba(8,7,6,0.82); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:50;">
+      <div style="text-align:center; padding:60px 70px; border:1px solid var(--accent); background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); max-width:440px;">
+        <div style="width:64px; height:64px; border-radius:50%; border:2px solid var(--accent); margin:0 auto 28px; display:flex; align-items:center; justify-content:center; font-size:30px; color:var(--accent);">⏰</div>
+        <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:14px;">{{ ringKind }}</div>
+        <div style="font-family:'Marcellus',serif; font-size:30px; margin-bottom:36px;">{{ ringLabel }}</div>
+        <button onClick="{{ dismissRing }}" style="padding:14px 44px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:13px; letter-spacing:2px; text-transform:uppercase; border-radius:12px; cursor:pointer;">Dismiss</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1240,&quot;height&quot;:1000},&quot;timeFormat&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;24h&quot;,&quot;options&quot;:[&quot;24h&quot;,&quot;12h&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;secondHand&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Sweep&quot;,&quot;options&quot;:[&quot;Sweep&quot;,&quot;Tick&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.rootRef = React.createRef();
+    this.zoneMap = {
+      'Pacific/Honolulu': 'Honolulu', 'America/Anchorage': 'Anchorage', 'America/Los_Angeles': 'Los Angeles',
+      'America/Phoenix': 'Phoenix', 'America/Denver': 'Denver', 'America/Chicago': 'Chicago', 'America/Mexico_City': 'Mexico City',
+      'America/New_York': 'New York', 'America/Toronto': 'Toronto', 'America/Bogota': 'Bogotá', 'America/Santiago': 'Santiago',
+      'America/Argentina/Buenos_Aires': 'Buenos Aires', 'America/Sao_Paulo': 'São Paulo', 'Atlantic/Reykjavik': 'Reykjavík',
+      'Europe/London': 'London', 'Europe/Dublin': 'Dublin', 'Europe/Lisbon': 'Lisbon', 'Europe/Paris': 'Paris',
+      'Europe/Madrid': 'Madrid', 'Europe/Amsterdam': 'Amsterdam', 'Europe/Berlin': 'Berlin', 'Europe/Zurich': 'Zurich',
+      'Europe/Rome': 'Rome', 'Europe/Stockholm': 'Stockholm', 'Europe/Athens': 'Athens', 'Europe/Istanbul': 'Istanbul',
+      'Europe/Moscow': 'Moscow', 'Africa/Lagos': 'Lagos', 'Africa/Cairo': 'Cairo', 'Africa/Nairobi': 'Nairobi',
+      'Africa/Johannesburg': 'Johannesburg', 'Asia/Jerusalem': 'Jerusalem', 'Asia/Tehran': 'Tehran', 'Asia/Dubai': 'Dubai',
+      'Asia/Karachi': 'Karachi', 'Asia/Kolkata': 'Mumbai', 'Asia/Kathmandu': 'Kathmandu', 'Asia/Dhaka': 'Dhaka',
+      'Asia/Colombo': 'Colombo', 'Asia/Bangkok': 'Bangkok', 'Asia/Jakarta': 'Jakarta', 'Asia/Singapore': 'Singapore',
+      'Asia/Hong_Kong': 'Hong Kong', 'Asia/Shanghai': 'Shanghai', 'Asia/Manila': 'Manila', 'Asia/Seoul': 'Seoul',
+      'Asia/Tokyo': 'Tokyo', 'Australia/Perth': 'Perth', 'Australia/Adelaide': 'Adelaide', 'Australia/Sydney': 'Sydney',
+      'Pacific/Auckland': 'Auckland',
+    };
+    this.zones = Object.keys(this.zoneMap);
+    this.zoneAbbr = {
+      'Pacific/Honolulu':['HST','Hawaii Time'], 'America/Anchorage':['AKST','Alaska Time'], 'America/Los_Angeles':['PST','Pacific Time'],
+      'America/Phoenix':['MST','Mountain Time'], 'America/Denver':['MST','Mountain Time'], 'America/Chicago':['CST','Central Time'], 'America/Mexico_City':['CST','Central Time'],
+      'America/New_York':['EST','Eastern Time'], 'America/Toronto':['EST','Eastern Time'], 'America/Bogota':['COT','Colombia Time'], 'America/Santiago':['CLT','Chile Time'],
+      'America/Argentina/Buenos_Aires':['ART','Argentina Time'], 'America/Sao_Paulo':['BRT','Brasília Time'], 'Atlantic/Reykjavik':['GMT','Greenwich Mean Time'],
+      'Europe/London':['GMT','UK Time'], 'Europe/Dublin':['GMT','Ireland Time'], 'Europe/Lisbon':['WET','Western European Time'], 'Europe/Paris':['CET','Central European Time'],
+      'Europe/Madrid':['CET','Central European Time'], 'Europe/Amsterdam':['CET','Central European Time'], 'Europe/Berlin':['CET','Central European Time'], 'Europe/Zurich':['CET','Central European Time'],
+      'Europe/Rome':['CET','Central European Time'], 'Europe/Stockholm':['CET','Central European Time'], 'Europe/Athens':['EET','Eastern European Time'], 'Europe/Istanbul':['TRT','Turkey Time'],
+      'Europe/Moscow':['MSK','Moscow Time'], 'Africa/Lagos':['WAT','West Africa Time'], 'Africa/Cairo':['EET','Eastern European Time'], 'Africa/Nairobi':['EAT','East Africa Time'],
+      'Africa/Johannesburg':['SAST','South Africa Time'], 'Asia/Jerusalem':['IST','Israel Time'], 'Asia/Tehran':['IRST','Iran Time'], 'Asia/Dubai':['GST','Gulf Time'],
+      'Asia/Karachi':['PKT','Pakistan Time'], 'Asia/Kolkata':['IST','India Time'], 'Asia/Kathmandu':['NPT','Nepal Time'], 'Asia/Dhaka':['BST','Bangladesh Time'],
+      'Asia/Colombo':['SLST','Sri Lanka Time'], 'Asia/Bangkok':['ICT','Indochina Time'], 'Asia/Jakarta':['WIB','Western Indonesia Time'], 'Asia/Singapore':['SGT','Singapore Time'],
+      'Asia/Hong_Kong':['HKT','Hong Kong Time'], 'Asia/Shanghai':['CST','China Standard Time'], 'Asia/Manila':['PHT','Philippine Time'], 'Asia/Seoul':['KST','Korea Time'],
+      'Asia/Tokyo':['JST','Japan Time'], 'Australia/Perth':['AWST','Australian Western Time'], 'Australia/Adelaide':['ACST','Australian Central Time'], 'Australia/Sydney':['AEST','Australian Eastern Time'],
+      'Pacific/Auckland':['NZST','New Zealand Time'],
+    };
+    const IN = 'Asia/Kolkata', ET = 'America/New_York', CT = 'America/Chicago', MT = 'America/Denver', PT = 'America/Los_Angeles', AZ = 'America/Phoenix';
+    this.places = [
+      // India
+      { n: 'New Delhi', r: 'Delhi, India', z: IN }, { n: 'Delhi', r: 'India', z: IN }, { n: 'Mumbai', r: 'Maharashtra, India', z: IN }, { n: 'Maharashtra', r: 'India', z: IN }, { n: 'Bengaluru', r: 'Karnataka, India', z: IN }, { n: 'Karnataka', r: 'India', z: IN }, { n: 'Chennai', r: 'Tamil Nadu, India', z: IN }, { n: 'Tamil Nadu', r: 'India', z: IN }, { n: 'Hyderabad', r: 'Telangana, India', z: IN }, { n: 'Telangana', r: 'India', z: IN }, { n: 'Andhra Pradesh', r: 'India', z: IN }, { n: 'Visakhapatnam', r: 'Andhra Pradesh, India', z: IN }, { n: 'Kolkata', r: 'West Bengal, India', z: IN }, { n: 'West Bengal', r: 'India', z: IN }, { n: 'Ahmedabad', r: 'Gujarat, India', z: IN }, { n: 'Gujarat', r: 'India', z: IN }, { n: 'Surat', r: 'Gujarat, India', z: IN }, { n: 'Pune', r: 'Maharashtra, India', z: IN }, { n: 'Nagpur', r: 'Maharashtra, India', z: IN }, { n: 'Jaipur', r: 'Rajasthan, India', z: IN }, { n: 'Rajasthan', r: 'India', z: IN }, { n: 'Lucknow', r: 'Uttar Pradesh, India', z: IN }, { n: 'Uttar Pradesh', r: 'India', z: IN }, { n: 'Kanpur', r: 'Uttar Pradesh, India', z: IN }, { n: 'Kochi', r: 'Kerala, India', z: IN }, { n: 'Kerala', r: 'India', z: IN }, { n: 'Thiruvananthapuram', r: 'Kerala, India', z: IN }, { n: 'Chandigarh', r: 'India', z: IN }, { n: 'Punjab', r: 'India', z: IN }, { n: 'Amritsar', r: 'Punjab, India', z: IN }, { n: 'Bhopal', r: 'Madhya Pradesh, India', z: IN }, { n: 'Indore', r: 'Madhya Pradesh, India', z: IN }, { n: 'Madhya Pradesh', r: 'India', z: IN }, { n: 'Patna', r: 'Bihar, India', z: IN }, { n: 'Bihar', r: 'India', z: IN }, { n: 'Guwahati', r: 'Assam, India', z: IN }, { n: 'Assam', r: 'India', z: IN }, { n: 'Bhubaneswar', r: 'Odisha, India', z: IN }, { n: 'Goa', r: 'India', z: IN },
+      // USA — Eastern
+      { n: 'New York', r: 'New York, USA', z: ET }, { n: 'Reston', r: 'Virginia, USA', z: ET }, { n: 'Virginia', r: 'USA', z: ET }, { n: 'Washington, D.C.', r: 'USA', z: ET }, { n: 'Boston', r: 'Massachusetts, USA', z: ET }, { n: 'Massachusetts', r: 'USA', z: ET }, { n: 'Atlanta', r: 'Georgia, USA', z: ET }, { n: 'Georgia', r: 'USA', z: ET }, { n: 'Miami', r: 'Florida, USA', z: ET }, { n: 'Orlando', r: 'Florida, USA', z: ET }, { n: 'Florida', r: 'USA', z: ET }, { n: 'Philadelphia', r: 'Pennsylvania, USA', z: ET }, { n: 'Pennsylvania', r: 'USA', z: ET }, { n: 'Pittsburgh', r: 'Pennsylvania, USA', z: ET }, { n: 'Detroit', r: 'Michigan, USA', z: ET }, { n: 'Michigan', r: 'USA', z: ET }, { n: 'Columbus', r: 'Ohio, USA', z: ET }, { n: 'Cleveland', r: 'Ohio, USA', z: ET }, { n: 'Ohio', r: 'USA', z: ET }, { n: 'Charlotte', r: 'North Carolina, USA', z: ET }, { n: 'Raleigh', r: 'North Carolina, USA', z: ET }, { n: 'North Carolina', r: 'USA', z: ET },
+      // USA — Central
+      { n: 'Chicago', r: 'Illinois, USA', z: CT }, { n: 'Illinois', r: 'USA', z: CT }, { n: 'Wichita', r: 'Kansas, USA', z: CT }, { n: 'Kansas', r: 'USA', z: CT }, { n: 'Kansas City', r: 'Missouri, USA', z: CT }, { n: 'Missouri', r: 'USA', z: CT }, { n: 'St. Louis', r: 'Missouri, USA', z: CT }, { n: 'Dallas', r: 'Texas, USA', z: CT }, { n: 'Houston', r: 'Texas, USA', z: CT }, { n: 'Austin', r: 'Texas, USA', z: CT }, { n: 'San Antonio', r: 'Texas, USA', z: CT }, { n: 'Texas', r: 'USA', z: CT }, { n: 'Minneapolis', r: 'Minnesota, USA', z: CT }, { n: 'Minnesota', r: 'USA', z: CT }, { n: 'Nashville', r: 'Tennessee, USA', z: CT }, { n: 'Memphis', r: 'Tennessee, USA', z: CT }, { n: 'Tennessee', r: 'USA', z: CT }, { n: 'New Orleans', r: 'Louisiana, USA', z: CT }, { n: 'Louisiana', r: 'USA', z: CT }, { n: 'Oklahoma City', r: 'Oklahoma, USA', z: CT }, { n: 'Oklahoma', r: 'USA', z: CT }, { n: 'Milwaukee', r: 'Wisconsin, USA', z: CT }, { n: 'Wisconsin', r: 'USA', z: CT },
+      // USA — Mountain / Arizona
+      { n: 'Denver', r: 'Colorado, USA', z: MT }, { n: 'Colorado', r: 'USA', z: MT }, { n: 'Colorado Springs', r: 'Colorado, USA', z: MT }, { n: 'Salt Lake City', r: 'Utah, USA', z: MT }, { n: 'Utah', r: 'USA', z: MT }, { n: 'Albuquerque', r: 'New Mexico, USA', z: MT }, { n: 'New Mexico', r: 'USA', z: MT }, { n: 'Boise', r: 'Idaho, USA', z: MT }, { n: 'Idaho', r: 'USA', z: MT }, { n: 'Cheyenne', r: 'Wyoming, USA', z: MT }, { n: 'Wyoming', r: 'USA', z: MT }, { n: 'Montana', r: 'USA', z: MT }, { n: 'Phoenix', r: 'Arizona, USA', z: AZ }, { n: 'Tucson', r: 'Arizona, USA', z: AZ }, { n: 'Arizona', r: 'USA', z: AZ },
+      // USA — Pacific / AK / HI
+      { n: 'Los Angeles', r: 'California, USA', z: PT }, { n: 'San Francisco', r: 'California, USA', z: PT }, { n: 'San Diego', r: 'California, USA', z: PT }, { n: 'Sacramento', r: 'California, USA', z: PT }, { n: 'San Jose', r: 'California, USA', z: PT }, { n: 'California', r: 'USA', z: PT }, { n: 'Seattle', r: 'Washington, USA', z: PT }, { n: 'Washington (state)', r: 'USA', z: PT }, { n: 'Portland', r: 'Oregon, USA', z: PT }, { n: 'Oregon', r: 'USA', z: PT }, { n: 'Las Vegas', r: 'Nevada, USA', z: PT }, { n: 'Nevada', r: 'USA', z: PT }, { n: 'Anchorage', r: 'Alaska, USA', z: 'America/Anchorage' }, { n: 'Alaska', r: 'USA', z: 'America/Anchorage' }, { n: 'Honolulu', r: 'Hawaii, USA', z: 'Pacific/Honolulu' }, { n: 'Hawaii', r: 'USA', z: 'Pacific/Honolulu' },
+      // World
+      { n: 'London', r: 'United Kingdom', z: 'Europe/London' }, { n: 'United Kingdom', r: 'Europe', z: 'Europe/London' }, { n: 'Manchester', r: 'United Kingdom', z: 'Europe/London' }, { n: 'Dublin', r: 'Ireland', z: 'Europe/Dublin' }, { n: 'Paris', r: 'France', z: 'Europe/Paris' }, { n: 'France', r: 'Europe', z: 'Europe/Paris' }, { n: 'Berlin', r: 'Germany', z: 'Europe/Berlin' }, { n: 'Germany', r: 'Europe', z: 'Europe/Berlin' }, { n: 'Munich', r: 'Germany', z: 'Europe/Berlin' }, { n: 'Madrid', r: 'Spain', z: 'Europe/Madrid' }, { n: 'Spain', r: 'Europe', z: 'Europe/Madrid' }, { n: 'Barcelona', r: 'Spain', z: 'Europe/Madrid' }, { n: 'Rome', r: 'Italy', z: 'Europe/Rome' }, { n: 'Italy', r: 'Europe', z: 'Europe/Rome' }, { n: 'Amsterdam', r: 'Netherlands', z: 'Europe/Amsterdam' }, { n: 'Zurich', r: 'Switzerland', z: 'Europe/Zurich' }, { n: 'Stockholm', r: 'Sweden', z: 'Europe/Stockholm' }, { n: 'Moscow', r: 'Russia', z: 'Europe/Moscow' }, { n: 'Russia', r: 'Europe', z: 'Europe/Moscow' }, { n: 'Istanbul', r: 'Türkiye', z: 'Europe/Istanbul' }, { n: 'Dubai', r: 'United Arab Emirates', z: 'Asia/Dubai' }, { n: 'Abu Dhabi', r: 'United Arab Emirates', z: 'Asia/Dubai' }, { n: 'Singapore', r: 'Singapore', z: 'Asia/Singapore' }, { n: 'Hong Kong', r: 'China SAR', z: 'Asia/Hong_Kong' }, { n: 'Tokyo', r: 'Japan', z: 'Asia/Tokyo' }, { n: 'Japan', r: 'Asia', z: 'Asia/Tokyo' }, { n: 'Osaka', r: 'Japan', z: 'Asia/Tokyo' }, { n: 'Shanghai', r: 'China', z: 'Asia/Shanghai' }, { n: 'Beijing', r: 'China', z: 'Asia/Shanghai' }, { n: 'China', r: 'Asia', z: 'Asia/Shanghai' }, { n: 'Seoul', r: 'South Korea', z: 'Asia/Seoul' }, { n: 'Bangkok', r: 'Thailand', z: 'Asia/Bangkok' }, { n: 'Jakarta', r: 'Indonesia', z: 'Asia/Jakarta' }, { n: 'Karachi', r: 'Pakistan', z: 'Asia/Karachi' }, { n: 'Lahore', r: 'Pakistan', z: 'Asia/Karachi' }, { n: 'Dhaka', r: 'Bangladesh', z: 'Asia/Dhaka' }, { n: 'Kathmandu', r: 'Nepal', z: 'Asia/Kathmandu' }, { n: 'Colombo', r: 'Sri Lanka', z: 'Asia/Colombo' }, { n: 'Sydney', r: 'Australia', z: 'Australia/Sydney' }, { n: 'Melbourne', r: 'Australia', z: 'Australia/Melbourne' }, { n: 'Australia', r: 'Oceania', z: 'Australia/Sydney' }, { n: 'Auckland', r: 'New Zealand', z: 'Pacific/Auckland' }, { n: 'Toronto', r: 'Canada', z: 'America/Toronto' }, { n: 'Canada', r: 'North America', z: 'America/Toronto' }, { n: 'Vancouver', r: 'Canada', z: 'America/Vancouver' }, { n: 'Mexico City', r: 'Mexico', z: 'America/Mexico_City' }, { n: 'Mexico', r: 'North America', z: 'America/Mexico_City' }, { n: 'São Paulo', r: 'Brazil', z: 'America/Sao_Paulo' }, { n: 'Brazil', r: 'South America', z: 'America/Sao_Paulo' }, { n: 'Buenos Aires', r: 'Argentina', z: 'America/Argentina/Buenos_Aires' }, { n: 'Johannesburg', r: 'South Africa', z: 'Africa/Johannesburg' }, { n: 'Cairo', r: 'Egypt', z: 'Africa/Cairo' }, { n: 'Nairobi', r: 'Kenya', z: 'Africa/Nairobi' }, { n: 'Lagos', r: 'Nigeria', z: 'Africa/Lagos' },
+    ];
+    this.tabDefs = [
+      { id: 'clock', label: 'Clock' }, { id: 'stopwatch', label: 'Stopwatch' }, { id: 'timer', label: 'Timer' },
+      { id: 'tasks', label: 'Tasks' }, { id: 'calendar', label: 'Calendar' }, { id: 'countdowns', label: 'Countdown' },
+      { id: 'converter', label: 'Converter' }, { id: 'alarm', label: 'Alarm' }, { id: 'contact', label: 'Contact' },
+    ];
+    this.facts = [
+      'A day on Venus is longer than its entire year.',
+      'There are exactly 86,400 seconds in a single day.',
+      'India Standard Time runs at UTC+5:30 — one of the few half-hour offsets.',
+      'Nepal keeps an unusual UTC+5:45, a 45-minute offset.',
+      'The Unix epoch began at midnight UTC on 1 January 1970.',
+      'Leap seconds are occasionally added to keep clocks aligned with Earth.',
+      'Atomic clocks drift by about one second every 100 million years.',
+      'France spans 12 time zones — more than any other country.',
+      'During the French Revolution, the day was briefly split into 10 hours.',
+      'ISO 8601 timestamps are designed to sort correctly as plain text.',
+    ];
+    let tz = 'Asia/Kolkata';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || tz; } catch (e) {}
+    const defFrom = this.zoneMap[tz] ? tz : 'Asia/Kolkata';
+    const today = new Date();
+    this._firedAlarms = {};
+    this._timerFired = false;
+    const prefs = this.load('time24_prefs', {});
+    const defPins = [
+      { zone: 'America/Los_Angeles', label: '' }, { zone: 'America/New_York', label: '' }, { zone: 'Europe/London', label: '' },
+      { zone: 'Asia/Dubai', label: '' }, { zone: 'Asia/Tokyo', label: '' }, { zone: 'Australia/Sydney', label: '' },
+    ];
+    let view = prefs.view && this.tabDefs.some(t => t.id === prefs.view) ? prefs.view : 'clock';
+    let fromZone = defFrom, toZone = defFrom === 'America/New_York' ? 'Asia/Kolkata' : 'America/New_York', fromTime = this.nowHHMM(defFrom);
+    try {
+      const h = (location.hash || '').match(/t24=([^&]+)/);
+      if (h) { const parts = decodeURIComponent(h[1]).split('|'); if (parts.length === 3 && this.zoneMap[parts[0]] && this.zoneMap[parts[1]]) { fromZone = parts[0]; toZone = parts[1]; fromTime = parts[2]; view = 'converter'; } }
+    } catch (e) {}
+    this.state = {
+      view, is12: prefs.is12 != null ? prefs.is12 : (props.timeFormat || '24h') === '12h',
+      theme: prefs.theme === 'light' ? 'light' : 'dark',
+      skin: ['aurora','ember','noir'].includes(prefs.skin) ? prefs.skin : 'aurora',
+      localZone: tz, lat: 28.6139, lng: 77.2090, locName: 'New Delhi, India',
+      factIndex: 0, toast: null, search: '',
+      fromZone, toZone, fromTime, meetHour: 9,
+      sw: { running: false, base: 0, startTs: 0, laps: [] },
+      tm: { running: false, total: 0, remaining: 0, endTs: 0 }, tmH: '0', tmM: '25', tmS: '0',
+      focusLog: this.load('time24_focus', {}),
+      tasks: this.load('time24_tasks', []), taskName: '', taskMins: 25,
+      alarms: this.load('time24_alarms', []), alarmTime: '07:00', alarmLabel: '',
+      pinned: this.load('time24_pinned', defPins), newPinZone: 'Europe/Paris', newPinLabel: '', pinSearch: '',
+      countdowns: this.load('time24_countdowns', []), cdTitle: '', cdDate: '', cdTime: '',
+      calYear: today.getFullYear(), calMonth: today.getMonth(),
+      selectedDate: this.dateKey(today.getFullYear(), today.getMonth(), today.getDate()),
+      events: this.load('time24_events', {}), evtTitle: '', evtTime: '',
+      fbType: 'Feedback', fbName: '', fbEmail: '', fbMsg: '', feedbacks: this.load('time24_feedback', []),
+      ringing: null,
+    };
+  }
+
+  load(k, fb) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
+  save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  get accent() { return this.props.accent || '#C6A664'; }
+  get is12() { return this.state.is12; }
+  get sweep() { return (this.props.secondHand || 'Sweep') !== 'Tick'; }
+  pad(n) { return String(n).padStart(2, '0'); }
+  dateKey(y, m, d) { return y + '-' + this.pad(m + 1) + '-' + this.pad(d); }
+
+  getParts(tz, date) {
+    const dtf = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour12: false, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const m = {}; for (const p of dtf.formatToParts(date)) { if (p.type !== 'literal') m[p.type] = p.value; }
+    let hour = parseInt(m.hour, 10); if (hour === 24) hour = 0;
+    return { year: +m.year, month: +m.month, day: +m.day, hour, minute: +m.minute, second: +m.second };
+  }
+  getOffset(tz, date) { const p = this.getParts(tz, date); return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(date.getTime() / 1000) * 1000; }
+  wallToInstant(tz, y, mo, d, h, mi) { const g = Date.UTC(y, mo - 1, d, h, mi, 0); return g - this.getOffset(tz, new Date(g)); }
+  nowHHMM(zone) { const p = this.getParts(zone, new Date()); return this.pad(p.hour) + ':' + this.pad(p.minute); }
+  gmt(zone, date) { const min = Math.round(this.getOffset(zone, date) / 60000); const s = min < 0 ? '−' : '+'; const a = Math.abs(min); return 'GMT' + s + Math.floor(a / 60) + (a % 60 ? ':' + this.pad(a % 60) : ''); }
+  fmtDiff(min) { if (min === 0) return 'Same time'; const s = min < 0 ? '−' : '+'; const a = Math.abs(min); return s + Math.floor(a / 60) + 'h' + (a % 60 ? ' ' + (a % 60) + 'm' : ''); }
+  hm12(h) { const ap = h < 12 ? 'AM' : 'PM'; let hh = h % 12; if (hh === 0) hh = 12; return { h: hh, ap }; }
+
+  sunTimes(date, lat, lng) {
+    const RAD = Math.PI / 180, dayMs = 86400000, J1970 = 2440588, J2000 = 2451545;
+    const toJ = d => d.valueOf() / dayMs - 0.5 + J1970, fromJ = j => new Date((j + 0.5 - J1970) * dayMs), toDays = d => toJ(d) - J2000;
+    const e = RAD * 23.4397, M = d => RAD * (357.5291 + 0.98560028 * d);
+    const eclLng = m => m + RAD * (1.9148 * Math.sin(m) + 0.02 * Math.sin(2 * m) + 0.0003 * Math.sin(3 * m)) + RAD * 102.9372 + Math.PI;
+    const dec = l => Math.asin(Math.sin(e) * Math.sin(l)), J0 = 0.0009;
+    const lw = RAD * -lng, phi = RAD * lat, d = toDays(date), n = Math.round(d - J0 - lw / (2 * Math.PI));
+    const ds = J0 + lw / (2 * Math.PI) + n, m = M(ds), L = eclLng(m);
+    const Jnoon = J2000 + ds + 0.0053 * Math.sin(m) - 0.0069 * Math.sin(2 * L), decl = dec(L), h0 = -0.833 * RAD;
+    const w = Math.acos((Math.sin(h0) - Math.sin(phi) * Math.sin(decl)) / (Math.cos(phi) * Math.cos(decl)));
+    const a = J0 + (w + lw) / (2 * Math.PI) + n, Jset = J2000 + a + 0.0053 * Math.sin(m) - 0.0069 * Math.sin(2 * L), Jrise = Jnoon - (Jset - Jnoon);
+    return { sunrise: fromJ(Jrise), sunset: fromJ(Jset) };
+  }
+  moonPhase(date) { const syn = 29.530588853, known = Date.UTC(2000, 0, 6, 18, 14); let ph = (((date.getTime() - known) / 86400000) % syn) / syn; if (ph < 0) ph += 1; return ph; }
+  searchResults(q) {
+    q = (q || '').trim().toLowerCase(); if (!q) return [];
+    const starts = [], contains = [];
+    for (const p of this.places) {
+      const n = p.n.toLowerCase(), r = p.r.toLowerCase();
+      if (n.startsWith(q) || r.startsWith(q)) starts.push(p);
+      else if (n.includes(q) || r.includes(q)) contains.push(p);
+    }
+    const seen = {}, out = [];
+    for (const p of starts.concat(contains)) { const k = p.n + '|' + p.z; if (!seen[k]) { seen[k] = 1; out.push(p); } if (out.length >= 6) break; }
+    return out;
+  }
+  moonName(ph) { if (ph < 0.03 || ph > 0.97) return 'New Moon'; if (ph < 0.22) return 'Waxing Crescent'; if (ph < 0.28) return 'First Quarter'; if (ph < 0.47) return 'Waxing Gibbous'; if (ph < 0.53) return 'Full Moon'; if (ph < 0.72) return 'Waning Gibbous'; if (ph < 0.78) return 'Last Quarter'; return 'Waning Crescent'; }
+
+  ensureAudio() { if (!this.actx) { try { this.actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (this.actx && this.actx.state === 'suspended') this.actx.resume(); }
+  ensureNotify() { try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} }
+  notify(title, body) { try { if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body }); } catch (e) {} }
+  beep() { if (!this.actx) return; const t = this.actx.currentTime; [0, 0.18].forEach((off, i) => { const o = this.actx.createOscillator(), g = this.actx.createGain(); o.connect(g); g.connect(this.actx.destination); o.type = 'sine'; o.frequency.value = i ? 1100 : 880; g.gain.setValueAtTime(0.0001, t + off); g.gain.exponentialRampToValueAtTime(0.28, t + off + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.14); o.start(t + off); o.stop(t + off + 0.16); }); }
+  startRing(kind, label) { this.ensureAudio(); this.notify(kind, label); this.setState({ ringing: { kind, label } }); this.beep(); if (this.ringInt) clearInterval(this.ringInt); this.ringInt = setInterval(() => this.beep(), 1300); }
+  dismiss() { if (this.ringInt) { clearInterval(this.ringInt); this.ringInt = null; } this.setState({ ringing: null }); }
+  showToast(msg) { this.setState({ toast: msg }); if (this._toastT) clearTimeout(this._toastT); this._toastT = setTimeout(() => this.setState({ toast: null }), 2400); }
+
+  componentDidMount() {
+    this.applyTheme();
+    this.applyAccent();
+    this.running = true;
+    const loop = () => { if (!this.running) return; this.tick(); this.raf = requestAnimationFrame(loop); };
+    loop();
+    this.factInt = setInterval(() => this.setState(s => ({ factIndex: (s.factIndex + 1) % this.facts.length })), 9000);
+    this.onKey = (e) => {
+      if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+      const map = { '1': 'clock', '2': 'stopwatch', '3': 'timer', '4': 'tasks', '5': 'calendar', '6': 'countdowns', '7': 'converter', '8': 'alarm', '9': 'contact' };
+      if (map[e.key]) this.setState({ view: map[e.key] });
+      else if (e.key === 't' || e.key === 'T') this.setState(s => ({ is12: !s.is12 }));
+    };
+    window.addEventListener('keydown', this.onKey);
+    if (navigator.geolocation) navigator.geolocation.getCurrentPosition((pos) => this.setState({ lat: pos.coords.latitude, lng: pos.coords.longitude, locName: 'Your location' }), () => {}, { timeout: 8000 });
+  }
+  componentDidUpdate() {
+    this.applyTheme();
+    this.applyAccent();
+    if (this._lastView !== this.state.view || this._lastFmt !== this.state.is12 || this._lastTheme !== this.state.theme || this._lastSkin !== this.state.skin) { this._lastView = this.state.view; this._lastFmt = this.state.is12; this._lastTheme = this.state.theme; this._lastSkin = this.state.skin; this.save('time24_prefs', { view: this.state.view, is12: this.state.is12, theme: this.state.theme, skin: this.state.skin }); }
+  }
+  componentWillUnmount() { this.running = false; if (this.raf) cancelAnimationFrame(this.raf); if (this.ringInt) clearInterval(this.ringInt); if (this.factInt) clearInterval(this.factInt); window.removeEventListener('keydown', this.onKey); }
+  applyAccent() { const r = this.rootRef.current; if (r && this.props.accent) r.style.setProperty('--accent', this.props.accent); }
+  get skinDefs() {
+    return {
+      aurora: {
+        dark:  { bg:'#07060d', fg:'236,233,244', accent:'#b39bff', accentRgb:'179,155,255', grad:'linear-gradient(120deg,#22d3ee 0%,#a855f7 50%,#f472b6 100%)', panel:'rgba(255,255,255,0.05)', field:'rgba(255,255,255,0.06)', onAccent:'#0b0918', shadow:'0 24px 60px -28px rgba(0,0,0,0.85)', blobs:['rgba(34,211,238,0.42)','rgba(168,85,247,0.46)','rgba(244,114,182,0.40)','rgba(99,102,241,0.42)'] },
+        light: { bg:'#edeefb', fg:'31,27,52', accent:'#7c3aed', accentRgb:'124,58,237', grad:'linear-gradient(120deg,#0ea5e9 0%,#7c3aed 50%,#db2777 100%)', panel:'rgba(255,255,255,0.58)', field:'rgba(255,255,255,0.78)', onAccent:'#ffffff', shadow:'0 24px 55px -26px rgba(80,55,160,0.45)', blobs:['rgba(56,189,248,0.26)','rgba(168,85,247,0.24)','rgba(236,72,153,0.22)','rgba(99,102,241,0.24)'] },
+      },
+      ember: {
+        dark:  { bg:'#0d0806', fg:'244,236,228', accent:'#fbbf24', accentRgb:'251,191,36', grad:'linear-gradient(120deg,#fbbf24 0%,#fb7185 52%,#db2777 100%)', panel:'rgba(255,255,255,0.05)', field:'rgba(255,255,255,0.06)', onAccent:'#1a0a04', shadow:'0 24px 60px -28px rgba(0,0,0,0.85)', blobs:['rgba(251,191,36,0.42)','rgba(251,113,133,0.44)','rgba(244,63,94,0.40)','rgba(249,115,22,0.42)'] },
+        light: { bg:'#fdf3ec', fg:'48,26,16', accent:'#e0562f', accentRgb:'224,86,47', grad:'linear-gradient(120deg,#f59e0b 0%,#fb7185 52%,#db2777 100%)', panel:'rgba(255,255,255,0.62)', field:'rgba(255,255,255,0.8)', onAccent:'#ffffff', shadow:'0 24px 55px -26px rgba(160,70,40,0.4)', blobs:['rgba(251,191,36,0.28)','rgba(251,113,133,0.26)','rgba(244,63,94,0.22)','rgba(249,115,22,0.26)'] },
+      },
+      noir: {
+        dark:  { bg:'#050505', fg:'238,238,240', accent:'#eaeaea', accentRgb:'234,234,234', grad:'linear-gradient(120deg,#fafafa 0%,#cfcfd2 100%)', panel:'rgba(255,255,255,0.04)', field:'rgba(255,255,255,0.05)', onAccent:'#050505', shadow:'0 24px 60px -30px rgba(0,0,0,0.9)', blobs:['rgba(255,255,255,0.05)','rgba(255,255,255,0.04)','rgba(255,255,255,0.035)','rgba(255,255,255,0.05)'] },
+        light: { bg:'#f4f4f5', fg:'18,18,22', accent:'#18181b', accentRgb:'24,24,27', grad:'linear-gradient(120deg,#27272a 0%,#52525b 100%)', panel:'rgba(255,255,255,0.66)', field:'rgba(255,255,255,0.82)', onAccent:'#ffffff', shadow:'0 22px 50px -28px rgba(0,0,0,0.3)', blobs:['rgba(0,0,0,0.05)','rgba(0,0,0,0.04)','rgba(0,0,0,0.035)','rgba(0,0,0,0.05)'] },
+      },
+    };
+  }
+  applyTheme() {
+    const r = this.rootRef.current; if (!r) return;
+    const set = this.skinDefs[this.state.skin] || this.skinDefs.aurora;
+    const t = set[this.state.theme] || set.dark;
+    const S = (k, v) => r.style.setProperty(k, v);
+    S('--bg', t.bg); S('--fg-rgb', t.fg); S('--accent', t.accent); S('--accent-rgb', t.accentRgb);
+    S('--grad', t.grad); S('--panel', t.panel); S('--field', t.field); S('--on-accent', t.onAccent); S('--shadow', t.shadow);
+    S('--blob-a', t.blobs[0]); S('--blob-b', t.blobs[1]); S('--blob-c', t.blobs[2]); S('--blob-d', t.blobs[3]);
+  }
+
+  tick() {
+    const root = this.rootRef.current; if (!root) return;
+    const now = new Date();
+    this.checkTimer(now); this.checkTasks(now); this.checkAlarms(now);
+    const set = (sel, txt) => { const el = root.querySelector(sel); if (el) el.textContent = txt; };
+    const lp = this.getParts(this.state.localZone, now), ms = now.getMilliseconds(), hr = lp.hour, min = lp.minute, sec = lp.second;
+    const hmEl = root.querySelector('[data-field="hm"]');
+    if (hmEl) {
+      if (this.is12) { const x = this.hm12(hr); hmEl.textContent = x.h + ':' + this.pad(min); set('[data-field="ap"]', x.ap); }
+      else { hmEl.textContent = this.pad(hr) + ':' + this.pad(min); set('[data-field="ap"]', ''); }
+      set('[data-field="sec"]', ':' + this.pad(sec));
+      if (this.is12) { const x = this.hm12(hr); set('[data-field="herohm"]', x.h + ':' + this.pad(min) + ' ' + x.ap); } else set('[data-field="herohm"]', this.pad(hr) + ':' + this.pad(min));
+      set('[data-field="herozone"]', (this.zoneMap[this.state.localZone] || 'Local'));
+      set('[data-field="date"]', new Intl.DateTimeFormat('en-GB', { timeZone: this.state.localZone, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now));
+      const frac = (hr * 3600 + min * 60 + sec) / 86400;
+      const bar = root.querySelector('[data-bar]'); if (bar) bar.style.width = (frac * 100).toFixed(3) + '%';
+      set('[data-field="prog"]', Math.floor(frac * 100) + '%');
+      const secDeg = (this.sweep ? sec + ms / 1000 : sec) * 6, minDeg = (min + sec / 60) * 6, hourDeg = ((hr % 12) + min / 60) * 30;
+      const sh = root.querySelector('[data-hand="sec"]'); if (sh) sh.style.transform = 'translateX(-50%) rotate(' + secDeg + 'deg)';
+      const mh = root.querySelector('[data-hand="min"]'); if (mh) mh.style.transform = 'translateX(-50%) rotate(' + minDeg + 'deg)';
+      const hh = root.querySelector('[data-hand="hour"]'); if (hh) hh.style.transform = 'translateX(-50%) rotate(' + hourDeg + 'deg)';
+      const yStart = Date.UTC(lp.year, 0, 1), todayUTC = Date.UTC(lp.year, lp.month - 1, lp.day), yEnd = Date.UTC(lp.year + 1, 0, 1);
+      set('[data-field="doy"]', Math.floor((todayUTC - yStart) / 86400000) + 1);
+      set('[data-field="yearprog"]', Math.floor((todayUTC - yStart) / (yEnd - yStart) * 100) + '%');
+      set('[data-field="week"]', this.isoWeek(lp.year, lp.month, lp.day));
+      set('[data-field="utc"]', this.gmt(this.state.localZone, now).replace('GMT', ''));
+      set('[data-field="unix"]', Math.floor(now.getTime() / 1000));
+      set('[data-field="iso"]', now.toISOString());
+      set('[data-field="rfc"]', now.toUTCString());
+    }
+    root.querySelectorAll('[data-city]').forEach((el) => {
+      const p = this.getParts(el.getAttribute('data-zone'), now);
+      const t = el.querySelector('[data-field="time"]'); if (t) t.textContent = this.pad(p.hour) + ':' + this.pad(p.minute) + ':' + this.pad(p.second);
+      const isDay = p.hour >= 6 && p.hour < 18;
+      const dot = el.querySelector('[data-field="dot"]'); if (dot) dot.style.background = isDay ? this.accent : 'rgba(var(--fg-rgb),0.25)';
+      const st = el.querySelector('[data-field="state"]'); if (st) st.textContent = isDay ? 'Day' : 'Night';
+    });
+    const swEl = root.querySelector('[data-sw-time]');
+    if (swEl) { const s = this.state.sw; swEl.textContent = this.fmtSw(s.running ? s.base + (now.getTime() - s.startTs) : s.base); }
+    const tmEl = root.querySelector('[data-tm-time]');
+    if (tmEl) { const t = this.state.tm; const rem = t.running ? Math.max(0, t.endTs - now.getTime()) : t.remaining; tmEl.textContent = this.fmtTimer(rem); const b = root.querySelector('[data-tm-bar]'); if (b) b.style.width = (t.total > 0 ? (1 - rem / t.total) * 100 : 0) + '%'; }
+    root.querySelectorAll('[data-task-id]').forEach((el) => {
+      const tk = this.state.tasks.find(x => String(x.id) === el.getAttribute('data-task-id')); if (!tk) return;
+      const rem = tk.done ? 0 : Math.max(0, tk.endTs - now.getTime());
+      const rEl = el.querySelector('[data-field="taskremain"]'); if (rEl) rEl.textContent = tk.done ? 'Done' : this.fmtTimer(rem);
+      const bar = el.querySelector('[data-field="taskbar"]'); if (bar) bar.style.width = (tk.total > 0 ? (1 - rem / tk.total) * 100 : 0) + '%';
+      const dot = el.querySelector('[data-field="taskdot"]'); if (dot) dot.style.background = tk.done ? '#5a8a63' : this.accent;
+    });
+    root.querySelectorAll('[data-cd-card]').forEach((el) => {
+      const target = +el.getAttribute('data-target'); let diff = Math.max(0, target - now.getTime());
+      const d = Math.floor(diff / 86400000); diff -= d * 86400000; const h = Math.floor(diff / 3600000); diff -= h * 3600000; const m = Math.floor(diff / 60000); diff -= m * 60000; const s = Math.floor(diff / 1000);
+      const setc = (sel, v) => { const x = el.querySelector(sel); if (x) x.textContent = v; };
+      setc('[data-cd-d]', d); setc('[data-cd-h]', this.pad(h)); setc('[data-cd-m]', this.pad(m)); setc('[data-cd-s]', this.pad(s));
+    });
+    set('[data-field="alarmnow"]', this.pad(hr) + ':' + this.pad(min) + ':' + this.pad(sec));
+    root.querySelectorAll('[data-search-zone]').forEach((el) => {
+      const p = this.getParts(el.getAttribute('data-search-zone'), now);
+      const t = el.querySelector('[data-field="srtime"]');
+      if (t) { if (this.is12) { const x = this.hm12(p.hour); t.textContent = x.h + ':' + this.pad(p.minute) + ' ' + x.ap; } else t.textContent = this.pad(p.hour) + ':' + this.pad(p.minute) + ':' + this.pad(p.second); }
+      const dd = el.querySelector('[data-field="srday"]'); if (dd) dd.textContent = new Intl.DateTimeFormat('en-GB', { timeZone: el.getAttribute('data-search-zone'), weekday: 'short', day: 'numeric', month: 'short' }).format(now);
+    });
+  }
+
+  isoWeek(y, m, d) { const dt = new Date(Date.UTC(y, m - 1, d)); const day = (dt.getUTCDay() + 6) % 7; dt.setUTCDate(dt.getUTCDate() - day + 3); const f = new Date(Date.UTC(dt.getUTCFullYear(), 0, 4)); return 1 + Math.round(((dt - f) / 86400000 - 3 + ((f.getUTCDay() + 6) % 7)) / 7); }
+  fmtSw(ms) { let t = Math.max(0, ms); const cs = Math.floor((t % 1000) / 10); t = Math.floor(t / 1000); const s = t % 60; t = Math.floor(t / 60); const mm = t % 60; const h = Math.floor(t / 60); return (h > 0 ? h + ':' + this.pad(mm) : this.pad(mm)) + ':' + this.pad(s) + '.' + this.pad(cs); }
+  fmtTimer(ms) { let t = Math.max(0, Math.round(ms / 1000)); const s = t % 60; t = Math.floor(t / 60); const m = t % 60; const h = Math.floor(t / 60); return (h > 0 ? this.pad(h) + ':' : '') + this.pad(m) + ':' + this.pad(s); }
+
+  checkTimer(now) { const t = this.state.tm; if (t.running && now.getTime() >= t.endTs && !this._timerFired) { this._timerFired = true; this.setState({ tm: { ...t, running: false, remaining: 0 } }); this.recordFocus(); this.startRing('Timer', 'Time is up'); } }
+  recordFocus() { const lp = this.getParts(this.state.localZone, new Date()); const k = this.dateKey(lp.year, lp.month - 1, lp.day); const focusLog = { ...this.state.focusLog }; focusLog[k] = (focusLog[k] || 0) + 1; this.setState({ focusLog }); this.save('time24_focus', focusLog); }
+  checkTasks(now) { let changed = false; const tasks = this.state.tasks.map(tk => { if (!tk.done && tk.running && now.getTime() >= tk.endTs) { changed = true; this.startRing('Task Complete', tk.name); return { ...tk, done: true, running: false }; } return tk; }); if (changed) { this.setState({ tasks }); this.save('time24_tasks', tasks); } }
+  checkAlarms(now) { const lp = this.getParts(this.state.localZone, now); const hhmm = this.pad(lp.hour) + ':' + this.pad(lp.minute); const dk = this.dateKey(lp.year, lp.month - 1, lp.day); this.state.alarms.forEach(a => { if (a.enabled && a.time === hhmm) { const key = a.id + '|' + dk + '|' + hhmm; if (!this._firedAlarms[key]) { this._firedAlarms[key] = true; this.startRing('Alarm', a.label || a.time); } } }); }
+
+  renderVals() {
+    const s = this.state, now = new Date();
+    const tabs = this.tabDefs.map(t => ({ id: t.id, label: t.label, onClick: () => this.setState({ view: t.id }), color: s.view === t.id ? 'rgb(var(--fg-rgb))' : 'rgba(var(--fg-rgb),0.72)', border: s.view === t.id ? this.accent : 'transparent' }));
+    const tzAbbr = [
+      ['HST','Pacific/Honolulu'], ['PST','America/Los_Angeles'], ['MST','America/Denver'], ['CST','America/Chicago'],
+      ['EST','America/New_York'], ['GMT','Europe/London'], ['CET','Europe/Paris'], ['GST','Asia/Dubai'],
+      ['IST','Asia/Kolkata'], ['SGT','Asia/Singapore'], ['JST','Asia/Tokyo'], ['AEST','Australia/Sydney'],
+    ].map(([label, id]) => ({ label, id }));
+    const abbrOf = {}; tzAbbr.forEach(a => { abbrOf[a.id] = a.label; });
+    const shortName = z => { try { const v = new Intl.DateTimeFormat('en-US', { timeZone: z, timeZoneName: 'short' }).formatToParts(now).find(p => p.type === 'timeZoneName').value; return /^(GMT|UTC)/.test(v) ? null : v; } catch (e) { return null; } };
+    const codeFor = z => shortName(z) || (this.zoneAbbr[z] ? this.zoneAbbr[z][0] : this.gmt(z, now));
+    const labelFor = z => { const code = codeFor(z); const full = this.zoneAbbr[z] ? this.zoneAbbr[z][1] : null; return full ? code + ' · ' + full : code; };
+    const zoneOptions = this.zones.map(z => ({ id: z, label: this.zoneMap[z] + '  (' + codeFor(z) + ')   ·   ' + this.gmt(z, now) }));
+    const QP = (label, fz, tz) => ({ label, value: fz + '|' + tz });
+    const quickPairs = [
+      QP('IST → EST', 'Asia/Kolkata', 'America/New_York'), QP('IST → PST', 'Asia/Kolkata', 'America/Los_Angeles'),
+      QP('IST → GMT', 'Asia/Kolkata', 'Europe/London'), QP('EST → CST', 'America/New_York', 'America/Chicago'),
+      QP('EST → PST', 'America/New_York', 'America/Los_Angeles'), QP('PST → EST', 'America/Los_Angeles', 'America/New_York'),
+      QP('GMT → IST', 'Europe/London', 'Asia/Kolkata'), QP('EST → IST', 'America/New_York', 'Asia/Kolkata'),
+      QP('GMT → JST', 'Europe/London', 'Asia/Tokyo'), QP('GST → IST', 'Asia/Dubai', 'Asia/Kolkata'),
+    ];
+    // converter
+    const fp = this.getParts(s.fromZone, now); const pr = (s.fromTime || '00:00').split(':'); const fh = +pr[0] || 0, fm = +pr[1] || 0;
+    const d = new Date(this.wallToInstant(s.fromZone, fp.year, fp.month, fp.day, fh, fm)); const tp = this.getParts(s.toZone, d);
+    let convertedTime, convertedAp = '';
+    if (this.is12) { const x = this.hm12(tp.hour); convertedTime = x.h + ':' + this.pad(tp.minute); convertedAp = x.ap; } else convertedTime = this.pad(tp.hour) + ':' + this.pad(tp.minute);
+    const fromKey = fp.year * 1e4 + fp.month * 100 + fp.day, toKey = tp.year * 1e4 + tp.month * 100 + tp.day;
+    const dayDeltaStr = toKey > fromKey ? 'Next day' : toKey < fromKey ? 'Previous day' : 'Same day';
+    const diffMin = Math.round((this.getOffset(s.toZone, d) - this.getOffset(s.fromZone, d)) / 60000);
+    const offsetStr = this.fmtDiff(diffMin);
+    // overlap cells
+    const fromCells = [], toCells = []; let overlapHours = 0;
+    const nowFromH = this.getParts(s.fromZone, now).hour;
+    const meetTotal = Math.round((((s.meetHour % 24) + 24) % 24) * 60);
+    const selH = Math.floor(meetTotal / 60), selMin = meetTotal % 60;
+    const setMeet = (i) => () => this.setState({ meetHour: i });
+    for (let i = 0; i < 24; i++) {
+      const fromWork = i >= 9 && i < 17;
+      let tm = (i * 60 + diffMin) % 1440; if (tm < 0) tm += 1440; const toH = Math.floor(tm / 60), toMin = tm % 60;
+      const toWork = toH >= 9 && toH < 17; const overlap = fromWork && toWork; if (overlap) overlapHours++;
+      const isSel = i === selH;
+      const nb = isSel ? '2px solid rgb(var(--fg-rgb))' : (i === nowFromH ? '2px solid ' + this.accent : '1px solid rgba(var(--fg-rgb),0.06)');
+      fromCells.push({ label: this.pad(i), border: nb, onClick: setMeet(i), bg: overlap ? 'var(--accent)' : fromWork ? 'rgba(var(--accent-rgb),0.22)' : 'rgba(255,255,255,0.02)', color: overlap ? 'var(--on-accent)' : fromWork ? 'rgb(var(--fg-rgb))' : 'rgba(var(--fg-rgb),0.4)' });
+      toCells.push({ label: this.pad(toH) + (toMin ? ':' + this.pad(toMin) : ''), border: nb, onClick: setMeet(i), bg: overlap ? 'var(--accent)' : toWork ? 'rgba(var(--accent-rgb),0.22)' : 'rgba(255,255,255,0.02)', color: overlap ? 'var(--on-accent)' : toWork ? 'rgb(var(--fg-rgb))' : 'rgba(var(--fg-rgb),0.4)' });
+    }
+    let mtm = (meetTotal + diffMin) % 1440, dayTag = ''; const rawM = meetTotal + diffMin; if (rawM >= 1440) dayTag = ' +1d'; else if (rawM < 0) dayTag = ' −1d'; if (mtm < 0) mtm += 1440;
+    const mToH = Math.floor(mtm / 60), mToMin = mtm % 60, mToWork = mToH >= 9 && mToH < 17;
+    const mFromLabel = this.is12 ? (() => { const x = this.hm12(selH); return x.h + ':' + this.pad(selMin) + ' ' + x.ap; })() : this.pad(selH) + ':' + this.pad(selMin);
+    const mToLabel = (this.is12 ? (() => { const x = this.hm12(mToH); return x.h + ':' + this.pad(mToMin) + ' ' + x.ap; })() : this.pad(mToH) + ':' + this.pad(mToMin)) + dayTag;
+    const meetStatus = mToWork && (selH >= 9 && selH < 17) ? 'Both in business hours' : mToWork ? 'Good for ' + this.zoneMap[s.toZone] : 'Outside 9–5 there';
+    const meetStatusColor = mToWork && (selH >= 9 && selH < 17) ? 'var(--accent)' : 'rgba(var(--fg-rgb),0.45)';
+    // sun & moon
+    const st = this.sunTimes(now, s.lat, s.lng);
+    const fmtT = (dd) => isNaN(dd) ? '—' : new Intl.DateTimeFormat('en-GB', { timeZone: s.localZone, hour: '2-digit', minute: '2-digit', hour12: false }).format(dd);
+    let daylight = '—'; if (!isNaN(st.sunrise) && !isNaN(st.sunset)) { const mins = Math.round((st.sunset - st.sunrise) / 60000); daylight = Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm'; }
+    const ph = this.moonPhase(now), moonLitPct = Math.round((1 - Math.cos(2 * Math.PI * ph)) / 2 * 100);
+    const _R = 50, _rx = Math.abs(_R * Math.cos(2 * Math.PI * ph)).toFixed(2);
+    const _s1 = ph <= 0.5 ? 1 : 0, _s2 = ph <= 0.5 ? (ph < 0.25 ? 1 : 0) : (ph < 0.75 ? 0 : 1);
+    const moonPath = 'M0,' + (-_R) + ' A' + _R + ',' + _R + ' 0 0 ' + _s1 + ' 0,' + _R + ' A' + _rx + ',' + _R + ' 0 0 ' + _s2 + ' 0,' + (-_R) + ' Z';
+    const _us1 = _s1 === 1 ? 0 : 1;
+    const moonShadowPath = 'M0,' + (-_R) + ' A' + _R + ',' + _R + ' 0 0 ' + _us1 + ' 0,' + _R + ' A' + _rx + ',' + _R + ' 0 0 ' + _s2 + ' 0,' + (-_R) + ' Z';
+    // stopwatch
+    const laps = s.sw.laps.map((lp2, i) => ({ n: i + 1, lap: this.fmtSw(i === 0 ? lp2 : lp2 - s.sw.laps[i - 1]), total: this.fmtSw(lp2) }));
+    // timer presets + focus
+    const mk = (label, msv) => ({ label, onClick: () => { this.ensureAudio(); this.ensureNotify(); this._timerFired = false; this.setState({ tm: { running: false, total: msv, remaining: msv, endTs: 0 }, tmH: String(Math.floor(msv / 3600000)), tmM: String(Math.floor(msv / 60000) % 60), tmS: String(Math.floor(msv / 1000) % 60) }); } });
+    const timerPresets = [mk('1 min', 60000), mk('5 min', 300000), mk('10 min', 600000), mk('25 min', 1500000), mk('45 min', 2700000), mk('1 hour', 3600000)];
+    const lpf = this.getParts(s.localZone, now); const todayK = this.dateKey(lpf.year, lpf.month - 1, lpf.day);
+    const focusToday = s.focusLog[todayK] || 0;
+    let focusTotal = 0; Object.values(s.focusLog).forEach(v => focusTotal += v);
+    let focusStreak = 0; { let cur = new Date(lpf.year, lpf.month - 1, lpf.day); if (!s.focusLog[this.dateKey(cur.getFullYear(), cur.getMonth(), cur.getDate())]) cur.setDate(cur.getDate() - 1); while (s.focusLog[this.dateKey(cur.getFullYear(), cur.getMonth(), cur.getDate())] > 0) { focusStreak++; cur.setDate(cur.getDate() - 1); } }
+    // tasks
+    const tp2 = (label, mins) => ({ label, bg: s.taskMins === mins ? 'var(--grad)' : 'transparent', border: s.taskMins === mins ? 'var(--accent)' : 'rgba(var(--fg-rgb),0.16)', color: s.taskMins === mins ? 'var(--on-accent)' : 'rgba(var(--fg-rgb),0.75)', onClick: () => this.setState({ taskMins: mins }) });
+    const taskPresets = [tp2('5m', 5), tp2('15m', 15), tp2('25m', 25), tp2('45m', 45), tp2('1h', 60)];
+    const tasks = s.tasks.map(tk => ({ id: tk.id, name: tk.name, dotColor: tk.done ? '#5a8a63' : this.accent, onDelete: () => this.deleteTask(tk.id) }));
+    // alarms
+    const alarms = s.alarms.map(a => {
+      let tl = a.time, st2 = '';
+      if (this.is12) { const [h, m] = a.time.split(':').map(Number); const x = this.hm12(h); tl = x.h + ':' + this.pad(m); st2 = x.ap + ' · '; }
+      st2 += a.enabled ? 'Active' : 'Off';
+      return { id: a.id, timeLabel: tl, label: a.label || 'Alarm', status: st2, timeColor: a.enabled ? 'rgb(var(--fg-rgb))' : 'rgba(var(--fg-rgb),0.35)', labelColor: a.enabled ? 'rgb(var(--fg-rgb))' : 'rgba(var(--fg-rgb),0.4)', toggleBg: a.enabled ? this.accent : 'transparent', toggleBorder: a.enabled ? this.accent : 'rgba(var(--fg-rgb),0.25)', knobLeft: a.enabled ? '27px' : '3px', knobBg: a.enabled ? 'var(--panel)' : 'rgba(var(--fg-rgb),0.6)', onToggle: () => this.toggleAlarm(a.id), onDelete: () => this.deleteAlarm(a.id) };
+    });
+    // pinned
+    const pinnedView = s.pinned.map((p, i) => ({ zone: p.zone, name: p.label || this.zoneMap[p.zone] || p.zone, sub: (p.label ? (this.zoneMap[p.zone] || '') + ' · ' : '') + this.gmt(p.zone, now), onRemove: () => this.removePin(i) }));
+    // countdowns
+    const nyYear = now.getFullYear() + 1, nyTarget = new Date(nyYear, 0, 1, 0, 0, 0).getTime();
+    const countdownsView = [{ target: nyTarget, title: 'New Year ' + nyYear, dateLabel: '1 Jan ' + nyYear, removable: false, onDelete: () => {} }].concat(
+      s.countdowns.map(c => ({ target: c.target, title: c.title, dateLabel: new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(c.target)), removable: true, onDelete: () => this.deleteCountdown(c.id) }))
+    );
+    // calendar
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const first = new Date(s.calYear, s.calMonth, 1).getDay(), dim = new Date(s.calYear, s.calMonth + 1, 0).getDate();
+    const todayKey = todayK;
+    const calCells = [];
+    for (let i = 0; i < first; i++) calCells.push({ day: '', bg: 'rgba(255,255,255,0.008)', color: 'transparent', ring: 'transparent', cursor: 'default', hasEvents: false, onClick: () => {} });
+    for (let dn = 1; dn <= dim; dn++) {
+      const key = this.dateKey(s.calYear, s.calMonth, dn), isToday = key === todayKey, isSel = key === s.selectedDate, has = !!(s.events[key] && s.events[key].length);
+      calCells.push({ day: dn, hasEvents: has, cursor: 'pointer', bg: isSel ? 'rgba(var(--accent-rgb),0.1)' : 'var(--panel)', color: isToday ? this.accent : 'rgb(var(--fg-rgb))', ring: isSel ? this.accent : 'transparent', onClick: () => this.setState({ selectedDate: key }) });
+    }
+    const selParts = s.selectedDate.split('-').map(Number), selDateObj = new Date(selParts[0], selParts[1] - 1, selParts[2]);
+    const selectedLabel = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(selDateObj);
+    const rawList = s.events[s.selectedDate] || [];
+    const selEvents = rawList.map((e, i) => ({ title: e.title, time: e.time || '—', _i: i })).sort((a, b) => (a.time || '99').localeCompare(b.time || '99')).map(e => ({ title: e.title, time: e.time, onDelete: () => this.deleteEvent(s.selectedDate, e._i) }));
+
+    return {
+      rootRef: this.rootRef, tabs, zoneOptions, tzAbbr,
+      isClock: s.view === 'clock', isStopwatch: s.view === 'stopwatch', isTimer: s.view === 'timer', isTasks: s.view === 'tasks', isCalendar: s.view === 'calendar', isCountdowns: s.view === 'countdowns', isConverter: s.view === 'converter', isAlarm: s.view === 'alarm', isContact: s.view === 'contact',
+      fbType: s.fbType, fbName: s.fbName, fbEmail: s.fbEmail, fbMsg: s.fbMsg,
+      fbTypes: ['Feedback', 'Bug report', 'Feature request', 'Other'].map(t => ({ label: t, active: s.fbType === t, onClick: () => this.setState({ fbType: t }), bg: s.fbType === t ? 'var(--grad)' : 'transparent', border: s.fbType === t ? 'var(--accent)' : 'rgba(var(--fg-rgb),0.16)', color: s.fbType === t ? 'var(--on-accent)' : 'rgba(var(--fg-rgb),0.75)' })),
+      fbTypeChange: e => this.setState({ fbType: e.target.value }), fbNameChange: e => this.setState({ fbName: e.target.value }), fbEmailChange: e => this.setState({ fbEmail: e.target.value }), fbMsgChange: e => this.setState({ fbMsg: e.target.value }),
+      submitFeedback: () => this.submitFeedback(), canSubmit: s.fbMsg.trim().length > 0,
+      feedbacksView: s.feedbacks.slice().reverse().map((f, i) => ({ type: f.type, msg: f.msg, who: f.name ? f.name : 'Anonymous', when: f.when, onDelete: () => this.deleteFeedback(s.feedbacks.length - 1 - i) })),
+      hasFeedbacks: s.feedbacks.length > 0, noFeedbacks: s.feedbacks.length === 0,
+      formatLabel: this.is12 ? '12H' : '24H', toggleFormat: () => this.setState(x => ({ is12: !x.is12 })), goClock: () => this.setState({ view: 'clock' }), goConverter: () => this.setState({ view: 'converter' }),
+      theme: s.theme, themeLabel: s.theme === 'light' ? 'Dark' : 'Light', themeIcon: s.theme === 'light' ? '☾' : '☀', toggleTheme: () => this.setState(x => ({ theme: x.theme === 'light' ? 'dark' : 'light' })),
+      skin: s.skin, skins: [['aurora','Aurora'],['ember','Ember'],['noir','Noir']].map(([id, label]) => ({ id, label, active: s.skin === id, onClick: () => this.setState({ skin: id }), color: s.skin === id ? 'var(--on-accent)' : 'rgba(var(--fg-rgb),0.7)', bg: s.skin === id ? 'var(--grad)' : 'transparent' })),
+      localZoneLabel: (this.zoneMap[s.localZone] || s.localZone.split('/').pop().replace(/_/g, ' ')) + '   ·   ' + this.gmt(s.localZone, now),
+      fact: this.facts[s.factIndex],
+      search: s.search, searchChange: e => this.setState({ search: e.target.value }), clearSearch: () => this.setState({ search: '' }),
+      searchResults: this.searchResults(s.search).map(p => ({ zone: p.z, name: p.n, region: p.r, gmt: this.gmt(p.z, now), onPin: () => this.pinFromSearch(p) })),
+      hasQuery: !!s.search.trim(), hasResults: this.searchResults(s.search).length > 0, noResults: !!s.search.trim() && this.searchResults(s.search).length === 0,
+      copyUnix: (e) => this.copy(String(Math.floor(Date.now() / 1000)), e), copyIso: (e) => this.copy(new Date().toISOString(), e), copyRfc: (e) => this.copy(new Date().toUTCString(), e),
+      // converter
+      fromZone: s.fromZone, toZone: s.toZone, fromTime: s.fromTime, convertedTime, convertedAp, convertedDate: new Intl.DateTimeFormat('en-GB', { timeZone: s.toZone, weekday: 'short', day: 'numeric', month: 'short' }).format(d), fromDateStr: new Intl.DateTimeFormat('en-GB', { timeZone: s.fromZone, weekday: 'short', day: 'numeric', month: 'short' }).format(d), dayDeltaStr, offsetStr,
+      fromCity: this.zoneMap[s.fromZone], toCity: this.zoneMap[s.toZone], fromCells, toCells, overlapHours, quickPairs,
+      fromAbbr: labelFor(s.fromZone), toAbbr: labelFor(s.toZone),
+      pairValue: s.fromZone + '|' + s.toZone, onPickPair: e => { const v = (e.target.value || '').split('|'); if (v[0] && v[1]) this.setState({ fromZone: v[0], toZone: v[1] }); },
+      meetHour: (((s.meetHour % 24) + 24) % 24), meetHourChange: e => this.setState({ meetHour: +e.target.value }), meetFromLabel: mFromLabel, meetToLabel: mToLabel, meetStatus, meetStatusColor,
+      onFrom: e => this.setState({ fromZone: e.target.value }), onTo: e => this.setState({ toZone: e.target.value }), onFromTime: e => this.setState({ fromTime: e.target.value || '00:00' }), onSwap: () => this.setState(x => ({ fromZone: x.toZone, toZone: x.fromZone })), onNow: () => this.setState({ fromTime: this.nowHHMM(this.state.fromZone) }), shareTime: () => this.shareTime(),
+      // sun
+      sunrise: fmtT(st.sunrise), sunset: fmtT(st.sunset), daylight, moonName: this.moonName(ph), moonLitPct, moonPath, moonShadowPath, sunLocLabel: s.locName,
+      // stopwatch
+      swBtnLabel: s.sw.running ? 'Stop' : (s.sw.base > 0 ? 'Resume' : 'Start'), hasLaps: laps.length > 0, laps, swToggle: () => this.swToggle(), swLap: () => this.swLap(), swReset: () => this.swReset(),
+      // timer
+      tmBtnLabel: s.tm.running ? 'Pause' : 'Start', tmH: s.tmH, tmM: s.tmM, tmS: s.tmS, timerPresets, focusToday, focusStreak, focusTotal, tmHChange: e => this.setState({ tmH: e.target.value }), tmMChange: e => this.setState({ tmM: e.target.value }), tmSChange: e => this.setState({ tmS: e.target.value }), tmToggle: () => this.tmToggle(), tmReset: () => this.tmReset(),
+      // tasks
+      taskName: s.taskName, taskPresets, tasks, hasTasks: tasks.length > 0, noTasks: tasks.length === 0, taskNameChange: e => this.setState({ taskName: e.target.value }), addTask: () => this.addTask(),
+      // alarms
+      alarmTime: s.alarmTime, alarmLabel: s.alarmLabel, alarms, hasAlarms: alarms.length > 0, noAlarms: alarms.length === 0, alarmTimeChange: e => this.setState({ alarmTime: e.target.value }), alarmLabelChange: e => this.setState({ alarmLabel: e.target.value }), addAlarm: () => this.addAlarm(),
+      // pinned
+      pinnedView, newPinLabel: s.newPinLabel, newPinLabelChange: e => this.setState({ newPinLabel: e.target.value }),
+      pinSearch: s.pinSearch, pinSearchChange: e => this.setState({ pinSearch: e.target.value }),
+      pinSearchResults: this.searchResults(s.pinSearch).map(p => ({ zone: p.z, name: p.n, region: p.r, gmt: this.gmt(p.z, now), onPin: () => this.pinPlace(p) })),
+      hasPinQuery: !!s.pinSearch.trim(), hasPinResults: this.searchResults(s.pinSearch).length > 0, noPinResults: !!s.pinSearch.trim() && this.searchResults(s.pinSearch).length === 0,
+      // countdowns
+      countdownsView, cdTitle: s.cdTitle, cdDate: s.cdDate, cdTime: s.cdTime, cdTitleChange: e => this.setState({ cdTitle: e.target.value }), cdDateChange: e => this.setState({ cdDate: e.target.value }), cdTimeChange: e => this.setState({ cdTime: e.target.value }), addCountdown: () => this.addCountdown(),
+      // calendar
+      calMonthName: new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(s.calYear, s.calMonth, 1)), calYear: s.calYear, weekdays, calCells, selectedLabel, selEvents, hasSelEvents: selEvents.length > 0, noSelEvents: selEvents.length === 0, evtTitle: s.evtTitle, evtTime: s.evtTime, calPrev: () => this.calShift(-1), calNext: () => this.calShift(1), calToday: () => this.calToday(), evtTitleChange: e => this.setState({ evtTitle: e.target.value }), evtTimeChange: e => this.setState({ evtTime: e.target.value }), addEvent: () => this.addEvent(),
+      // toast + ring
+      hasToast: !!s.toast, toast: s.toast || '', isRinging: !!s.ringing, ringKind: s.ringing ? s.ringing.kind : '', ringLabel: s.ringing ? s.ringing.label : '', dismissRing: () => this.dismiss(),
+    };
+  }
+
+  copy(text, e) { try { navigator.clipboard.writeText(text); } catch (err) {} this.showToast('Copied to clipboard'); }
+  shareTime() {
+    let base = 'https://www.time24.co.in/';
+    try { base = location.origin + location.pathname; } catch (e) {}
+    const url = base + '#t24=' + encodeURIComponent([this.state.fromZone, this.state.toZone, this.state.fromTime].join('|'));
+    try { navigator.clipboard.writeText(url); } catch (e) {}
+    try { if (history && history.replaceState) history.replaceState(null, '', '#t24=' + encodeURIComponent([this.state.fromZone, this.state.toZone, this.state.fromTime].join('|'))); } catch (e) {}
+    this.showToast('Share link copied');
+  }
+  swToggle() { this.ensureAudio(); const s = this.state.sw; if (s.running) this.setState({ sw: { ...s, running: false, base: s.base + (Date.now() - s.startTs) } }); else this.setState({ sw: { ...s, running: true, startTs: Date.now() } }); }
+  swLap() { const s = this.state.sw; const el = s.running ? s.base + (Date.now() - s.startTs) : s.base; if (el > 0) this.setState({ sw: { ...s, laps: [...s.laps, el] } }); }
+  swReset() { this.setState({ sw: { running: false, base: 0, startTs: 0, laps: [] } }); }
+  tmToggle() { this.ensureAudio(); this.ensureNotify(); const t = this.state.tm; if (t.running) { this.setState({ tm: { ...t, running: false, remaining: Math.max(0, t.endTs - Date.now()) } }); } else { let rem, total; if (t.remaining > 0 && t.total > 0 && t.remaining < t.total) { rem = t.remaining; total = t.total; } else { total = (parseInt(this.state.tmH) || 0) * 3600000 + (parseInt(this.state.tmM) || 0) * 60000 + (parseInt(this.state.tmS) || 0) * 1000; rem = total; } if (rem <= 0) return; this._timerFired = false; this.setState({ tm: { running: true, total, remaining: rem, endTs: Date.now() + rem } }); } }
+  tmReset() { this._timerFired = false; this.setState({ tm: { running: false, total: 0, remaining: 0, endTs: 0 } }); }
+  addTask() { const name = (this.state.taskName || '').trim(); if (!name) return; this.ensureAudio(); this.ensureNotify(); const total = this.state.taskMins * 60000; const task = { id: Date.now(), name, total, endTs: Date.now() + total, running: true, done: false }; const tasks = [task, ...this.state.tasks]; this.setState({ tasks, taskName: '' }); this.save('time24_tasks', tasks); }
+  deleteTask(id) { const tasks = this.state.tasks.filter(t => t.id !== id); this.setState({ tasks }); this.save('time24_tasks', tasks); }
+  addAlarm() { if (!this.state.alarmTime) return; this.ensureNotify(); const a = { id: Date.now(), time: this.state.alarmTime, label: (this.state.alarmLabel || '').trim(), enabled: true }; const alarms = [...this.state.alarms, a].sort((x, y) => x.time.localeCompare(y.time)); this.setState({ alarms, alarmLabel: '' }); this.save('time24_alarms', alarms); }
+  toggleAlarm(id) { const alarms = this.state.alarms.map(a => a.id === id ? { ...a, enabled: !a.enabled } : a); this.setState({ alarms }); this.save('time24_alarms', alarms); }
+  deleteAlarm(id) { const alarms = this.state.alarms.filter(a => a.id !== id); this.setState({ alarms }); this.save('time24_alarms', alarms); }
+  submitFeedback() {
+    const msg = (this.state.fbMsg || '').trim();
+    if (!msg) { this.showToast('Please add a message first'); return; }
+    const when = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+    const feedbacks = [...this.state.feedbacks, { type: this.state.fbType, name: (this.state.fbName || '').trim(), email: (this.state.fbEmail || '').trim(), msg, when }];
+    this.setState({ feedbacks, fbMsg: '', fbName: '', fbEmail: '', fbType: 'Feedback' });
+    this.save('time24_feedback', feedbacks);
+    this.showToast('Thanks — your ' + (this.state.fbType || 'feedback').toLowerCase() + ' was sent');
+  }
+  deleteFeedback(i) { const feedbacks = this.state.feedbacks.filter((_, idx) => idx !== i); this.setState({ feedbacks }); this.save('time24_feedback', feedbacks); }
+  pinFromSearch(p) { if (this.state.pinned.some(x => x.zone === p.z && (x.label || '') === '')) { this.showToast(p.n + ' time zone already pinned'); return; } if (this.state.pinned.length >= 12) { this.showToast('Up to 12 cities'); return; } const pinned = [...this.state.pinned, { zone: p.z, label: p.n }]; this.setState({ pinned }); this.save('time24_pinned', pinned); this.showToast('Pinned ' + p.n); }
+  pinPlace(p) { if (this.state.pinned.length >= 12) { this.showToast('Up to 12 cities'); return; } const label = (this.state.newPinLabel || '').trim() || p.n; const pinned = [...this.state.pinned, { zone: p.z, label }]; this.setState({ pinned, pinSearch: '', newPinLabel: '' }); this.save('time24_pinned', pinned); this.showToast('Pinned ' + label); }
+  addPin() { if (this.state.pinned.length >= 12) { this.showToast('Up to 12 cities'); return; } const pinned = [...this.state.pinned, { zone: this.state.newPinZone, label: (this.state.newPinLabel || '').trim() }]; this.setState({ pinned, newPinLabel: '' }); this.save('time24_pinned', pinned); }
+  removePin(i) { const pinned = this.state.pinned.filter((_, idx) => idx !== i); this.setState({ pinned }); this.save('time24_pinned', pinned); }
+  addCountdown() { const title = (this.state.cdTitle || '').trim(); if (!title || !this.state.cdDate) { this.showToast('Add a name and date'); return; } const [y, mo, da] = this.state.cdDate.split('-').map(Number); const tm = (this.state.cdTime || '00:00').split(':').map(Number); const target = new Date(y, mo - 1, da, tm[0] || 0, tm[1] || 0).getTime(); const countdowns = [...this.state.countdowns, { id: Date.now(), title, target }]; this.setState({ countdowns, cdTitle: '', cdDate: '', cdTime: '' }); this.save('time24_countdowns', countdowns); }
+  deleteCountdown(id) { const countdowns = this.state.countdowns.filter(c => c.id !== id); this.setState({ countdowns }); this.save('time24_countdowns', countdowns); }
+  calShift(dir) { let m = this.state.calMonth + dir, y = this.state.calYear; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } this.setState({ calMonth: m, calYear: y }); }
+  calToday() { const t = new Date(); this.setState({ calYear: t.getFullYear(), calMonth: t.getMonth(), selectedDate: this.dateKey(t.getFullYear(), t.getMonth(), t.getDate()) }); }
+  addEvent() { const title = (this.state.evtTitle || '').trim(); if (!title) return; const events = { ...this.state.events }; const arr = (events[this.state.selectedDate] || []).slice(); arr.push({ title, time: this.state.evtTime || '' }); events[this.state.selectedDate] = arr; this.setState({ events, evtTitle: '', evtTime: '' }); this.save('time24_events', events); }
+  deleteEvent(key, idx) { const events = { ...this.state.events }; const arr = (events[key] || []).slice(); arr.splice(idx, 1); if (arr.length) events[key] = arr; else delete events[key]; this.setState({ events }); this.save('time24_events', events); }
+}
+</script>
+</body>
+</html>
