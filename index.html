@@ -1266,11 +1266,24 @@ class Component extends DCLogic {
   submitFeedback() {
     const msg = (this.state.fbMsg || '').trim();
     if (!msg) { this.showToast('Please add a message first'); return; }
+    const name = (this.state.fbName || '').trim();
+    const email = (this.state.fbEmail || '').trim();
+    const type = this.state.fbType || 'Feedback';
     const when = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
-    const feedbacks = [...this.state.feedbacks, { type: this.state.fbType, name: (this.state.fbName || '').trim(), email: (this.state.fbEmail || '').trim(), msg, when }];
-    this.setState({ feedbacks, fbMsg: '', fbName: '', fbEmail: '', fbType: 'Feedback' });
-    this.save('time24_feedback', feedbacks);
-    this.showToast('Thanks — your ' + (this.state.fbType || 'feedback').toLowerCase() + ' was sent');
+    fetch('https://formspree.io/f/xgojdwaa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ type, name, email, message: msg }),
+    }).then(r => {
+      if (r.ok) {
+        const feedbacks = [...this.state.feedbacks, { type, name, email, msg, when }];
+        this.setState({ feedbacks, fbMsg: '', fbName: '', fbEmail: '', fbType: 'Feedback' });
+        this.save('time24_feedback', feedbacks);
+        this.showToast('Thanks — your ' + type.toLowerCase() + ' was sent');
+      } else {
+        this.showToast('Could not send — please try again');
+      }
+    }).catch(() => this.showToast('Could not send — check your connection'));
   }
   deleteFeedback(i) { const feedbacks = this.state.feedbacks.filter((_, idx) => idx !== i); this.setState({ feedbacks }); this.save('time24_feedback', feedbacks); }
   dismissWhatsNew() { localStorage.setItem('time24_welcomed', '1'); this.setState({ showWhatsNew: false }); }
