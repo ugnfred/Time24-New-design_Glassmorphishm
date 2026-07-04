@@ -70,6 +70,53 @@
   @keyframes floatC { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(46px,-58px) scale(1.22);} }
   @keyframes floatD { 0%{transform:translate(0,0) scale(0.96);} 100%{transform:translate(-56px,-34px) scale(1.16);} }
   @keyframes glowPulse { 0%,100%{opacity:0.85;} 50%{opacity:1;} }
+
+  /* ── Mobile / Tablet Responsive ── */
+  @media (max-width:640px) {
+    [data-app-root] nav { padding:14px 16px 0 !important; gap:10px !important; }
+    [data-app-root] nav > div:last-child { gap:8px !important; }
+    [data-app-root] nav > div:first-child { font-size:18px !important; }
+    [data-app-root] section { padding-left:16px !important; padding-right:16px !important; }
+    .t24-hero { padding-left:16px !important; padding-right:16px !important; }
+    .t24-hero-card { min-height:320px !important; padding:24px 20px !important; }
+    .t24-hero h1 { font-size:32px !important; line-height:1.15 !important; }
+    .t24-hero p { font-size:14px !important; }
+    .t24-hero-card > div:first-child { top:20px !important; left:20px !important; right:20px !important; }
+    .t24-clock-grid { grid-template-columns:1fr !important; gap:24px !important; padding-top:36px !important; padding-bottom:36px !important; }
+    .t24-clock-grid > div:last-child { display:none !important; }
+    [data-field="hm"] { font-size:64px !important; letter-spacing:-1px !important; }
+    [data-field="sec"] { font-size:26px !important; }
+    [data-field="date"] { font-size:14px !important; }
+    .t24-stats-grid { grid-template-columns:1fr !important; gap:18px !important; padding-bottom:40px !important; }
+    .t24-pins-grid { grid-template-columns:1fr !important; }
+    [data-sw-time] { font-size:72px !important; letter-spacing:-2px !important; }
+    [data-tm-time] { font-size:72px !important; letter-spacing:-2px !important; }
+    .t24-cal-section { grid-template-columns:1fr !important; padding-top:40px !important; padding-bottom:48px !important; gap:28px !important; }
+    .t24-conv-panel { grid-template-columns:1fr !important; }
+    .t24-conv-panel > div:nth-child(2) { display:none !important; }
+    .t24-conv-panel > div { padding:28px 20px !important; }
+    .t24-conv-panel input[type="time"] { font-size:38px !important; }
+    .t24-conv-panel span[style*="54px"] { font-size:38px !important; }
+    .t24-overlap { padding:20px 16px !important; overflow-x:auto !important; -webkit-overflow-scrolling:touch !important; }
+    .t24-contact-grid { grid-template-columns:1fr !important; gap:24px !important; }
+    .t24-contact-right { border-left:none !important; padding-left:0 !important; border-top:1px solid rgba(128,128,128,0.15) !important; padding-top:24px !important; }
+    .t24-wnew { padding:28px 20px 24px !important; }
+    .t24-wnew > div[style*="30px"] { font-size:22px !important; }
+  }
+
+  @media (min-width:641px) and (max-width:1024px) {
+    [data-app-root] nav { padding:20px 28px 0 !important; }
+    [data-app-root] section { padding-left:28px !important; padding-right:28px !important; }
+    .t24-hero { padding-left:28px !important; padding-right:28px !important; }
+    .t24-hero h1 { font-size:46px !important; }
+    .t24-clock-grid { padding-left:28px !important; padding-right:28px !important; gap:36px !important; }
+    [data-field="hm"] { font-size:80px !important; }
+    [data-field="sec"] { font-size:34px !important; }
+    .t24-stats-grid { padding-left:28px !important; padding-right:28px !important; }
+    .t24-pins-grid { grid-template-columns:repeat(2,1fr) !important; }
+    .t24-cal-section { padding-left:28px !important; padding-right:28px !important; gap:24px !important; }
+    .t24-overlap { padding:24px 28px !important; }
+  }
 </style>
 </helmet>
 
@@ -109,8 +156,8 @@
   <sc-if value="{{ isClock }}" hint-placeholder-val="{{ true }}">
   <div>
     <!-- HERO -->
-    <section style="max-width:1240px; margin:26px auto 0; padding:0 48px;">
-      <div style="position:relative; border-radius:30px; overflow:hidden; min-height:480px; display:flex; flex-direction:column; justify-content:flex-end; padding:44px; box-shadow:var(--shadow);">
+    <section class="t24-hero" style="max-width:1240px; margin:26px auto 0; padding:0 48px;">
+      <div class="t24-hero-card" style="position:relative; border-radius:30px; overflow:hidden; min-height:480px; display:flex; flex-direction:column; justify-content:flex-end; padding:44px; box-shadow:var(--shadow);">
         <div style="position:absolute; inset:0; background:var(--grad); z-index:0;"></div>
         <div style="position:absolute; inset:0; background:radial-gradient(120% 90% at 20% 0%, rgba(0,0,0,0.05), transparent 45%), linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.52) 100%); z-index:1;"></div>
 
@@ -144,7 +191,7 @@
       </div>
     </section>
 
-    <section style="max-width:1240px; margin:0 auto; padding:64px 48px 56px; display:grid; grid-template-columns:1.15fr 0.85fr; gap:64px; align-items:center;">
+    <section class="t24-clock-grid" style="max-width:1240px; margin:0 auto; padding:64px 48px 56px; display:grid; grid-template-columns:1.15fr 0.85fr; gap:64px; align-items:center;">
       <div>
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px;">
           <span style="width:6px; height:6px; border-radius:50%; background:var(--grad);"></span>
@@ -235,7 +282,7 @@
     </section>
 
     <!-- STATS + FORMATS + SUN -->
-    <section style="max-width:1240px; margin:0 auto; padding:0 48px 70px; display:grid; grid-template-columns:1fr 1fr; gap:36px;">
+    <section class="t24-stats-grid" style="max-width:1240px; margin:0 auto; padding:0 48px 70px; display:grid; grid-template-columns:1fr 1fr; gap:36px;">
       <div style="border:1px solid rgba(var(--fg-rgb),0.12); padding:34px 36px;">
         <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:26px;">Timestamps &amp; Date</div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px 30px; margin-bottom:30px;">
@@ -323,7 +370,7 @@
           </div>
         </sc-if>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1);">
+      <div class="t24-pins-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(var(--fg-rgb),0.1); border:1px solid rgba(var(--fg-rgb),0.1);">
         <sc-for list="{{ pinnedView }}" as="c" hint-placeholder-count="6">
           <div data-city data-zone="{{ c.zone }}" style="background:var(--panel); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); box-shadow:var(--shadow); padding:30px 30px; transition:background .3s; position:relative;" style-hover="background:var(--field);">
             <button onClick="{{ c.onRemove }}" title="Remove" style="position:absolute; top:14px; right:14px; background:transparent; border:none; color:rgba(var(--fg-rgb),0.3); font-size:14px; cursor:pointer;" style-hover="color:#cf6a61;">✕</button>
@@ -448,7 +495,7 @@
 
   <!-- ===================== CALENDAR ===================== -->
   <sc-if value="{{ isCalendar }}" hint-placeholder-val="{{ true }}">
-  <section style="max-width:1240px; margin:0 auto; padding:72px 48px 90px; display:grid; grid-template-columns:1.5fr 1fr; gap:44px; align-items:start;">
+  <section class="t24-cal-section" style="max-width:1240px; margin:0 auto; padding:72px 48px 90px; display:grid; grid-template-columns:1.5fr 1fr; gap:44px; align-items:start;">
     <div>
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:30px;">
         <div style="display:flex; align-items:baseline; gap:14px;">
@@ -556,7 +603,7 @@
         <sc-for list="{{ tzAbbr }}" as="z" hint-placeholder-count="12"><option value="{{ z.id }}">{{ z.label }}</option></sc-for>
       </select>
     </div>
-    <div style="border:1px solid rgba(var(--fg-rgb),0.12); background:var(--panel); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); box-shadow:var(--shadow); display:grid; grid-template-columns:1fr auto 1fr;">
+    <div class="t24-conv-panel" style="border:1px solid rgba(var(--fg-rgb),0.12); background:var(--panel); -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px); box-shadow:var(--shadow); display:grid; grid-template-columns:1fr auto 1fr;">
       <div style="padding:46px 44px;">
         <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:20px;"><span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">From</span><span style="font-size:11px; letter-spacing:1.5px; color:var(--accent); font-variant-numeric:tabular-nums;">{{ fromAbbr }}</span></div>
         <select data-tz-select value="{{ fromZone }}" onChange="{{ onFrom }}" style="width:100%; background:var(--field); border:1px solid rgba(var(--fg-rgb),0.14); color:rgb(var(--fg-rgb)); font-family:'Jost',sans-serif; font-size:15px; padding:13px 14px; border-radius:12px; cursor:pointer;">
@@ -591,7 +638,7 @@
     </div>
 
     <!-- OVERLAP -->
-    <div style="border:1px solid rgba(var(--fg-rgb),0.12); border-top:none; padding:34px 44px;">
+    <div class="t24-overlap" style="border:1px solid rgba(var(--fg-rgb),0.12); border-top:none; padding:34px 44px;">
       <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
         <span style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4);">Working-hours overlap</span>
         <span style="font-size:13px; color:rgba(var(--fg-rgb),0.6);"><span style="color:var(--accent); font-size:18px; font-family:'Marcellus',serif;">{{ overlapHours }}</span> shared business hours · 9–5</span>
@@ -673,7 +720,7 @@
     </div>
     <p style="margin:0 0 38px; font-size:15px; line-height:1.7; color:rgba(var(--fg-rgb),0.55); max-width:560px;">Share feedback, report a bug, or request a feature. Tell us what would make TIME24 work better for you.</p>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:start;">
+    <div class="t24-contact-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:start;">
       <div>
         <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:16px;">What's this about?</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:30px;">
@@ -699,7 +746,7 @@
         <button onClick="{{ submitFeedback }}" style="margin-top:22px; padding:14px 30px; background:var(--grad); border:1px solid var(--accent); color:var(--on-accent); font-family:'Jost',sans-serif; font-weight:500; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; border-radius:12px; cursor:pointer;">Send message</button>
       </div>
 
-      <div style="border-left:1px solid rgba(var(--fg-rgb),0.1); padding-left:44px;">
+      <div class="t24-contact-right" style="border-left:1px solid rgba(var(--fg-rgb),0.1); padding-left:44px;">
         <div style="font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(var(--fg-rgb),0.4); margin-bottom:18px;">Your submissions</div>
         <sc-if value="{{ hasFeedbacks }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; flex-direction:column; gap:14px;">
@@ -741,7 +788,7 @@
   <!-- WHATS NEW POPUP -->
   <sc-if value="{{ showWhatsNew }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; inset:0; background:rgba(7,6,13,0.78); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; z-index:70; padding:24px;">
-      <div style="max-width:520px; width:100%; background:var(--panel); -webkit-backdrop-filter:blur(28px); backdrop-filter:blur(28px); border:1px solid rgba(var(--fg-rgb),0.14); box-shadow:var(--shadow); padding:48px 48px 40px; position:relative;">
+      <div class="t24-wnew" style="max-width:520px; width:100%; background:var(--panel); -webkit-backdrop-filter:blur(28px); backdrop-filter:blur(28px); border:1px solid rgba(var(--fg-rgb),0.14); box-shadow:var(--shadow); padding:48px 48px 40px; position:relative;">
         <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--grad);"></div>
         <div style="font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:16px;">We've been busy</div>
         <div style="font-family:'Marcellus',serif; font-size:30px; font-weight:400; line-height:1.15; margin-bottom:10px;">TIME 24 just got a whole lot better</div>
