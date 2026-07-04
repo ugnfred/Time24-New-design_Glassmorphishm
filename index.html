@@ -852,6 +852,25 @@ class Component extends DCLogic {
       'During the French Revolution, the day was briefly split into 10 hours.',
       'ISO 8601 timestamps are designed to sort correctly as plain text.',
     ];
+    this.tzCoords = {
+      'Pacific/Honolulu':[21.31,-157.86],'America/Anchorage':[61.22,-149.90],'America/Los_Angeles':[34.05,-118.24],
+      'America/Phoenix':[33.45,-112.07],'America/Denver':[39.74,-104.98],'America/Chicago':[41.88,-87.63],
+      'America/Mexico_City':[19.43,-99.13],'America/New_York':[40.71,-74.01],'America/Toronto':[43.65,-79.38],
+      'America/Bogota':[4.71,-74.07],'America/Santiago':[-33.45,-70.67],'America/Argentina/Buenos_Aires':[-34.60,-58.38],
+      'America/Sao_Paulo':[-23.55,-46.63],'Atlantic/Reykjavik':[64.13,-21.82],'Europe/London':[51.51,-0.13],
+      'Europe/Dublin':[53.33,-6.25],'Europe/Lisbon':[38.72,-9.14],'Europe/Paris':[48.85,2.35],
+      'Europe/Madrid':[40.42,-3.70],'Europe/Amsterdam':[52.37,4.90],'Europe/Berlin':[52.52,13.40],
+      'Europe/Zurich':[47.38,8.54],'Europe/Rome':[41.90,12.50],'Europe/Stockholm':[59.33,18.07],
+      'Europe/Athens':[37.98,23.73],'Europe/Istanbul':[41.01,28.95],'Europe/Moscow':[55.75,37.62],
+      'Africa/Lagos':[6.45,3.40],'Africa/Cairo':[30.06,31.25],'Africa/Nairobi':[-1.29,36.82],
+      'Africa/Johannesburg':[-26.20,28.04],'Asia/Jerusalem':[31.78,35.22],'Asia/Tehran':[35.69,51.42],
+      'Asia/Dubai':[25.20,55.27],'Asia/Karachi':[24.86,67.01],'Asia/Kolkata':[28.61,77.21],
+      'Asia/Kathmandu':[27.70,85.32],'Asia/Dhaka':[23.72,90.41],'Asia/Colombo':[6.93,79.85],
+      'Asia/Bangkok':[13.75,100.52],'Asia/Jakarta':[-6.21,106.85],'Asia/Singapore':[1.35,103.82],
+      'Asia/Hong_Kong':[22.32,114.17],'Asia/Shanghai':[31.23,121.47],'Asia/Manila':[14.60,120.98],
+      'Asia/Seoul':[37.57,126.98],'Asia/Tokyo':[35.68,139.69],'Australia/Perth':[-31.95,115.86],
+      'Australia/Adelaide':[-34.93,138.60],'Australia/Sydney':[-33.87,151.21],'Pacific/Auckland':[-36.86,174.77],
+    };
     let tz = 'Asia/Kolkata';
     try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || tz; } catch (e) {}
     const defFrom = this.zoneMap[tz] ? tz : 'Asia/Kolkata';
@@ -873,7 +892,7 @@ class Component extends DCLogic {
       view, is12: prefs.is12 != null ? prefs.is12 : (props.timeFormat || '24h') === '12h',
       theme: prefs.theme === 'light' ? 'light' : 'dark',
       skin: ['aurora','ember','noir'].includes(prefs.skin) ? prefs.skin : 'aurora',
-      localZone: tz, lat: 28.6139, lng: 77.2090, locName: 'New Delhi, India',
+      localZone: tz, lat: (this.tzCoords[tz] || this.tzCoords['Asia/Kolkata'])[0], lng: (this.tzCoords[tz] || this.tzCoords['Asia/Kolkata'])[1], locName: this.zoneMap[tz] || 'Local',
       factIndex: 0, toast: null, search: '',
       fromZone, toZone, fromTime, meetHour: 9,
       sw: { running: false, base: 0, startTs: 0, laps: [] },
