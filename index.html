@@ -78,10 +78,11 @@
     [data-app-root] nav > div:first-child { font-size:18px !important; }
     [data-app-root] section { padding-left:16px !important; padding-right:16px !important; }
     .t24-hero { padding-left:16px !important; padding-right:16px !important; }
-    .t24-hero-card { min-height:320px !important; padding:24px 20px !important; }
-    .t24-hero h1 { font-size:32px !important; line-height:1.15 !important; }
-    .t24-hero p { font-size:14px !important; }
-    .t24-hero-card > div:first-child { top:20px !important; left:20px !important; right:20px !important; }
+    .t24-hero-card { min-height:260px !important; padding:20px !important; }
+    .t24-hero-bar { top:20px !important; left:20px !important; right:20px !important; }
+    .t24-hero-floating { display:none !important; }
+    .t24-hero h1 { font-size:28px !important; line-height:1.2 !important; letter-spacing:0 !important; }
+    .t24-hero p { font-size:13px !important; margin-top:10px !important; }
     .t24-clock-grid { grid-template-columns:1fr !important; gap:24px !important; padding-top:36px !important; padding-bottom:36px !important; }
     .t24-clock-grid > div:last-child { display:none !important; }
     [data-field="hm"] { font-size:64px !important; letter-spacing:-1px !important; }
@@ -161,7 +162,7 @@
         <div style="position:absolute; inset:0; background:var(--grad); z-index:0;"></div>
         <div style="position:absolute; inset:0; background:radial-gradient(120% 90% at 20% 0%, rgba(0,0,0,0.05), transparent 45%), linear-gradient(180deg, rgba(0,0,0,0.14) 0%, rgba(0,0,0,0.10) 42%, rgba(0,0,0,0.52) 100%); z-index:1;"></div>
 
-        <div style="position:absolute; top:34px; left:44px; right:44px; display:flex; align-items:center; justify-content:space-between; z-index:2;">
+        <div class="t24-hero-bar" style="position:absolute; top:34px; left:44px; right:44px; display:flex; align-items:center; justify-content:space-between; z-index:2;">
           <span style="display:inline-flex; align-items:center; gap:9px; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.9);"><span style="width:7px; height:7px; border-radius:50%; background:#fff; box-shadow:0 0 12px rgba(255,255,255,0.9);"></span>Live · World Clock</span>
           <span style="display:inline-flex; align-items:center; gap:8px; padding:8px 15px; border-radius:40px; background:rgba(255,255,255,0.14); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.25); font-size:12px; letter-spacing:1px; color:#fff;"><span data-field="herozone">Local</span> · <span data-field="herohm">00:00</span></span>
         </div>
@@ -172,7 +173,7 @@
         </div>
 
         <!-- FLOATING CARD -->
-        <div style="position:relative; z-index:2; margin-top:40px; align-self:stretch; display:flex; flex-wrap:wrap; align-items:flex-end; gap:22px; padding:22px 26px; border-radius:20px; background:rgba(12,10,22,0.5); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.16); box-shadow:0 20px 50px -24px rgba(0,0,0,0.7);">
+        <div class="t24-hero-floating" style="position:relative; z-index:2; margin-top:40px; align-self:stretch; display:flex; flex-wrap:wrap; align-items:flex-end; gap:22px; padding:22px 26px; border-radius:20px; background:rgba(12,10,22,0.5); -webkit-backdrop-filter:blur(22px); backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.16); box-shadow:0 20px 50px -24px rgba(0,0,0,0.7);">
           <div style="flex:1; min-width:150px;">
             <div style="font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,0.55); margin-bottom:9px;">From</div>
             <select data-tz-select value="{{ fromZone }}" onChange="{{ onFrom }}" style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; font-family:'Jost',sans-serif; font-size:14px; letter-spacing:0.5px; padding:12px 14px; border-radius:12px; cursor:pointer;">
